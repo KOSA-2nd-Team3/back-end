@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>이메일 인증</title>
+    <style>
+        /* 전체 배경 */
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #333;
+        }
+
+        /* 중앙 카드 */
+        .card {
+          background-color: white;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+          padding: 40px 50px;
+          max-width: 400px;
+          text-align: center;
+        }
+
+        /* 제목 스타일 */
+        h2 {
+          margin-bottom: 20px;
+          font-size: 24px;
+          color: #222;
+        }
+
+        /* 안내 문구 */
+        p {
+          font-size: 16px;
+          color: #555;
+          line-height: 1.5;
+          margin-bottom: 30px;
+        }
+
+        /* 버튼 스타일 */
+        .verify-button {
+          display: inline-block;
+          background-color: #4caf50;
+          color: white;
+          font-weight: 600;
+          font-size: 18px;
+          padding: 15px 40px;
+          border-radius: 8px;
+          text-decoration: none;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+          user-select: none;
+          box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .verify-button:hover {
+          background-color: #45a049;
+          box-shadow: 0 7px 20px rgba(69, 160, 73, 0.6);
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>이메일 인증을 완료하려면<br/>아래 버튼을 클릭하세요.</h2>
+    <p>회원가입을 완료하기 위해서는 이메일 인증이 필요합니다.<br/>
+        이메일로 발송된 인증 메일을 확인해 주세요.</p>
+    <a class="verify-button"
+       th:href="${verificationLink}"
+       onclick="event.preventDefault(); verifyEmail(this.href);">
+        이메일 인증하기
+    </a>
+</div>
+
+<script>
+    function verifyEmail(url) {
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    alert('이메일 인증이 완료되었습니다.');
+                    // 인증 완료 후 로그인 페이지로 이동
+                    window.location.href = '/'; // 로그인 페이지 경로
+                } else {
+                    alert('이메일 인증에 실패했습니다. 유효한 링크인지 확인하세요.');
+                }
+            })
+            .catch(() => {
+                alert('네트워크 오류가 발생했습니다.');
+            });
+    }
+</script>
+</body>
+</html>
+

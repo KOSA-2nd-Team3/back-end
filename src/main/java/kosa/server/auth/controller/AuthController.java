@@ -1,5 +1,6 @@
 package kosa.server.auth.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,11 +15,13 @@ import kosa.server.common.security.user.CustomUserDetails;
 import kosa.server.common.util.CookieUtil;
 import kosa.server.member.exception.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Map;
 
 @RequestMapping("/api/auth")
@@ -45,10 +48,28 @@ public class AuthController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> joinMember(@RequestBody @Valid JoinRequestDto joinRequestDto) {
+    public ResponseEntity<String> joinMember(@RequestBody @Valid JoinRequestDto joinRequestDto) throws MessagingException {
         authService.joinMember(joinRequestDto);
+        authService.sendVerificationEmail(joinRequestDto.getEmail());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // 이메일 인증 토큰 확인용 엔드포인트 (예: GET /api/auth/verify?token=...)
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        boolean verified = authService.verifyEmailToken(token);
+
+        URI redirectUri;
+        if (verified) {
+            redirectUri = URI.create("http://localhost:5173/?verified=true");
+        } else {
+            redirectUri = URI.create("http://localhost:5173/verify-failed");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(redirectUri);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     // 상태 확인 엔드포인트
@@ -94,4 +115,6 @@ public class AuthController {
 
         return ResponseEntity.ok("액세스 토큰이 성공적으로 재발급되었습니다.");
     }
+
+
 }

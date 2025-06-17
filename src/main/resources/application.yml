@@ -7,6 +7,18 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: ${username}
     password: ${dbpassword}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}       # 보내는 이메일
+    password: ${MAIL_PASSWORD}       # 앱 비밀번호
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    default-encoding: UTF-8
 
   # JPA & Hibernate 설정
   jpa:

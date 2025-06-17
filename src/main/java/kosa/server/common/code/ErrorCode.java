@@ -23,7 +23,8 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A001", "유효하지 않은 토큰입니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A002", "만료된 토큰입니다."),
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "A003", "인증에 실패했습니다. 유효한 자격 증명이 필요합니다."),
-    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "A004", "액세스 토큰이 필요합니다.");
+    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "A004", "액세스 토큰이 필요합니다."),
+    EMAIL_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "A005", "이메일 인증이 필요합니다.");
 
     private final HttpStatus status;
     private final String code;

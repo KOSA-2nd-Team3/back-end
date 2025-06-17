@@ -57,7 +57,7 @@ public class SecurityConfig {
         // 인증 엔드포인트 설정
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue",  "/api/auth/verify", "/api/auth/send-verification-email").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
         http
@@ -86,4 +86,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

@@ -3,12 +3,11 @@ package kosa.server.common.advice;
 import jakarta.servlet.http.HttpServletRequest;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.common.dto.ErrorResponseDto;
-import kosa.server.member.exception.DuplicateMemberException;
-import kosa.server.member.exception.LoginFailedException;
-import kosa.server.member.exception.MemberNotFoundException;
-import kosa.server.member.exception.TokenNotFoundException;
+import kosa.server.member.exception.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -72,6 +71,18 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
 
         log.error("서버 오류 발생: {}", ex.getMessage(), ex);
+
+        ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
+        return new ResponseEntity<>(response, errorCode.getStatus());
+    }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<ErrorResponseDto> handleEmailNotVerifiedException(
+            EmailNotVerifiedException ex, HttpServletRequest request) {
+
+        ErrorCode errorCode = ex.getErrorCode();  // 예외에서 직접 errorCode 꺼내기
+
+        log.warn("이메일 인증이 완료되지 않은 사용자 접근: {}", ex.getMessage());
 
         ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
         return new ResponseEntity<>(response, errorCode.getStatus());

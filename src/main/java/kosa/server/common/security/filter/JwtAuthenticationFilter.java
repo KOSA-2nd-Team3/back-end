@@ -35,6 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
+
+        // 인증이 필요 없는 경로는 필터 건너뜀
+        if (uri.startsWith("/api/auth/verify") || uri.startsWith("/api/auth/join")
+                || uri.startsWith("/api/auth/send-verification-email")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 토큰 가져오고 없으면 null
         String accessToken = cookieUtil.getCookie(request, "accessToken")
                 .map(Cookie::getValue)

@@ -2,15 +2,13 @@ package kosa.server.member.entity;
 
 import jakarta.persistence.*;
 import kosa.server.common.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member extends BaseEntity {
@@ -34,6 +32,9 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
+    @Column(nullable = false)
+    private boolean enabled = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role; // 회원 권한 (USER, ADMIN)
@@ -42,13 +43,14 @@ public class Member extends BaseEntity {
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @Builder
-    private Member(String loginId, String password, String nickname, String name, String email, Role role) {
+    private Member(String loginId, String password, String nickname, String name, String email, Role role, boolean enabled) {
         this.loginId = loginId;
         this.password = password;
         this.nickname = nickname;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.enabled = false;
     }
 
     public void addRefreshToken(RefreshToken refreshToken) {
@@ -56,4 +58,7 @@ public class Member extends BaseEntity {
         refreshToken.setMember(this);
     }
 
+    public void verifyEmail() {
+        this.enabled = true;
+    }
 }
