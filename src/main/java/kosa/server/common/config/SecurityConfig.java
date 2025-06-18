@@ -1,7 +1,9 @@
 package kosa.server.common.config;
 
+import kosa.server.auth.oauth2.security.LoginSuccessHandler;
 import kosa.server.common.security.filter.JwtAuthenticationFilter;
 import kosa.server.common.security.handler.CustomAuthenticationEntryPoint;
+import kosa.server.auth.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,7 @@ public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint; // <-- 추가
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -34,7 +37,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource, LoginSuccessHandler loginSuccessHandler) throws Exception {
 
         http
                 .cors((cors) -> cors
@@ -57,7 +60,7 @@ public class SecurityConfig {
         // 인증 엔드포인트 설정
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue","/oauth2/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated());
         http
@@ -65,6 +68,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        //OAuth2
+        http
+                .oauth2Login(oauth2->oauth2
+                    .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
+                            .userService(customOAuth2UserService))
+                    )
+                    .successHandler(loginSuccessHandler));
+
         return http.build();
     }
 
