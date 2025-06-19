@@ -9,26 +9,17 @@ spring:
     password: ${dbpassword}
 
   mail:
-    host: smtp.gmail.com
+    host: smtp.test.com
     port: 587
-    username: ${MAIL_USERNAME}  # 보내는 이메일
-    password: ${MAIL_PASSWORD}  # 앱 비밀번호
+    username: test@example.com
+    password: dummy-password
     properties:
       mail:
-       smtp:
-        auth: true
-        starttls:
-          enable: true
-        ssl:
-          enable: false
-    service:
-      sender:
-        host: smtp.gmail.com
-        port: 587
-        username: ${MAIL_USERNAME}
-        password: ${MAIL_PASSWORD}
-        ssl:
-          enable: false
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
   # JPA & Hibernate 설정
   jpa:
