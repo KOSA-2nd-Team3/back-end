@@ -19,7 +19,6 @@ import kosa.server.member.repository.jpa.RefreshTokenRepository;
 import kosa.server.member.repository.jpa.RoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -92,9 +91,10 @@ public class AuthService {
         log.info("회원가입 성공 ID : {}, loginId : {}, nickname : {}", newMember.getId(), newMember.getLoginId(), newMember.getNickname());
     }
 
+    // todo 예외처리
     public void sendVerificationEmail(String email) throws MessagingException {
         Member member = memberJpaRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("해당 이메일로 등록된 사용자가 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 랜덤 인증 토큰 생성
         String token = UUID.randomUUID().toString();
@@ -114,21 +114,21 @@ public class AuthService {
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);
 
-        String htmlContent = templateEngine.process("verification-email", context);
+        String html = templateEngine.process("verification-email", context);
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
         helper.setTo(email);
         helper.setSubject("회원가입 이메일 인증");
-        helper.setText(htmlContent, true);
+        helper.setText(html, true);
 
         mailSender.send(mimeMessage);
     }
 
     public boolean verifyEmailToken(String token) {
         EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 토큰입니다."));
+                .orElseThrow(() -> new InvalidTokenException(ErrorCode.INVALID_TOKEN));
 
         // 만료 확인
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
@@ -150,7 +150,7 @@ public class AuthService {
         Member findMember = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // ✅ 이메일 인증 여부 확인
+        //  이메일 인증 여부 확인
         if (!findMember.isEnabled()) {
             throw new EmailNotVerifiedException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
