@@ -1,6 +1,8 @@
 package kosa.server.member.entity;
 
 import jakarta.persistence.*;
+import kosa.server.board.entity.PartyMember;
+import kosa.server.board.entity.Post;
 import kosa.server.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,7 +21,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 인조키
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(name = "login_id", unique = true, nullable = false, length = 50)
     private String loginId; // 실제 로그인 ID
 
     @Column(nullable = false)
@@ -40,6 +42,12 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Post> post = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<PartyMember> partyMember = new ArrayList<>();
 
     @Builder
     private Member(String loginId, String password, String nickname, String name, String email, Role role) {
