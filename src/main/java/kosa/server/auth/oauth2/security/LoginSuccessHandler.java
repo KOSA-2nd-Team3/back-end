@@ -1,7 +1,6 @@
 package kosa.server.auth.oauth2.security;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kosa.server.auth.oauth2.dto.CustomOAuth2User;
@@ -25,18 +24,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         String token = jwtProvider.createAccessToken(oAuth2User.getName(), oAuth2User.getEmail());
 
-        response.addCookie(createCookie("Authorization", token));
+        response.setHeader("Authorization", "Bearer " + token);
         response.sendRedirect("http://localhost:5173/");
-    }
-
-    private Cookie createCookie(String key, String value) {
-
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60 * 60 * 60);
-        //cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
     }
 }
