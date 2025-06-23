@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -14,7 +15,6 @@ public class MyPostResponseDto {
     private int currentCount;
     private int partySize;
     private BigDecimal price;
-    private String imageUrl;
     private String isOwner;
     private String isExpired;
 }

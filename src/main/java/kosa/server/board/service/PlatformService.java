@@ -1,9 +1,6 @@
 package kosa.server.board.service;
 
-import kosa.server.board.dto.response.PlatformPeopleSortDto;
-import kosa.server.board.dto.response.PlatformPostResponseDto;
-import kosa.server.board.dto.response.PlatformCategoryDto;
-import kosa.server.board.dto.response.PlatformSortResponseDto;
+import kosa.server.board.dto.response.*;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
 import kosa.server.board.repository.PlatformRepository;
@@ -53,6 +50,27 @@ public class PlatformService {
                         .imageUrl(platform.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<PlatformResponseDto> getPlatformList() {
+        return platformRepository.findAll().stream().map(p -> PlatformResponseDto.builder()
+                .platformId(p.getId())
+                .name((p.getName()))
+                .category(p.getCategory())
+                .build()).toList();
+    }
+
+    public PlatformResponseDto getPlatform(Long platformId) {
+        Platform findPlatform = platformRepository.findById(platformId)
+                .orElseThrow(() -> new RuntimeException("Platform not found"));
+
+        return PlatformResponseDto.builder()
+                .platformId(findPlatform.getId())
+                .name(findPlatform.getName())
+                .capacity(findPlatform.getCapacity())
+                .price(findPlatform.getPrice().longValue())
+                .monthUnit(findPlatform.getMonthUnit())
+                .build();
     }
 
     // 구하는 글 개수

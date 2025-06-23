@@ -14,10 +14,10 @@ import java.util.List;
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique=true)
+    @Column(name = "platform_id", unique=true, nullable = false)
     private Long id;
 
-    @Column(unique=true, nullable=false)
+    @Column(nullable=false)
     private String name;
 
     @Column(nullable=false)
@@ -29,10 +29,12 @@ public class Platform {
     @Column(nullable=false)
     private int category;
 
+    @Column(nullable = false)
+    private int monthUnit;
+
     @Column(name = "image_url", nullable=false)
     private String imageUrl;
 
     @OneToMany(mappedBy = "platform")
     private List<Post> post = new ArrayList<>();
 }
-
