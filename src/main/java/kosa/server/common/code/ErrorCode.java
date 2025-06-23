@@ -26,6 +26,9 @@ public enum ErrorCode {
     TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "A004", "액세스 토큰이 필요합니다."),
     EMAIL_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "A005", "이메일 인증이 필요합니다.");
 
+    // Chat (4xxx)
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CR001", "해당 채팅룸을 찾을 수 없습니다.");
+
     private final HttpStatus status;
     private final String code;
     private final String message;

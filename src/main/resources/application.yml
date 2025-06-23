@@ -7,6 +7,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: ${username}
     password: ${dbpassword}
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   mail:
     host: smtp.gmail.com
@@ -33,7 +37,7 @@ spring:
   # JPA & Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true # 실행되는 SQL 쿼리를 로그로 보여줍니다.
@@ -108,5 +112,6 @@ logging:
     org.hibernate.SQL: DEBUG
     # SQL에 바인딩되는 파라미터 값을 TRACE 레벨로 로깅합니다. (매우 유용함)
     org.hibernate.orm.jdbc.bind: TRACE
-    org.springframework.security: TRACE
-    org.springframework.web.client.RestTemplate: TRACE
+    org.springframework.messaging: DEBUG
+    org.springframework.web.socket: DEBUG
+    kosa.server.chat.config: DEBUG
