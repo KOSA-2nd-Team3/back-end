@@ -1,10 +1,10 @@
-package kosa.server.auth.oauth2.security;
+package kosa.server.auth.oauth2.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kosa.server.auth.oauth2.dto.CustomOAuth2User;
 import kosa.server.common.security.jwt.JwtProvider;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -20,7 +20,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+        CustomUserPrincipal oAuth2User = (CustomUserPrincipal) authentication.getPrincipal();
 
         String token = jwtProvider.createAccessToken(oAuth2User.getName(), oAuth2User.getEmail());
 

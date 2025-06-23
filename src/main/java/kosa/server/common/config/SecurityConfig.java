@@ -1,6 +1,6 @@
 package kosa.server.common.config;
 
-import kosa.server.auth.oauth2.security.LoginSuccessHandler;
+import kosa.server.auth.oauth2.handler.LoginSuccessHandler;
 import kosa.server.common.security.filter.JwtAuthenticationFilter;
 import kosa.server.common.security.handler.CustomAuthenticationEntryPoint;
 import kosa.server.auth.oauth2.service.CustomOAuth2UserService;
