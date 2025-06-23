@@ -37,7 +37,8 @@ public class AuthController {
         String refreshToken = (String) authData.get("refreshToken");
         UserInfoDto userInfo = (UserInfoDto) authData.get("userInfo");
 
-        cookieUtil.addCookie(response, "accessToken", accessToken, 30 * 60);
+//        cookieUtil.addCookie(response, "accessToken", accessToken, 30 * 60);
+        response.addHeader("Authorization", "Bearer " + accessToken);
         cookieUtil.addCookie(response, "refreshToken", refreshToken, 60 * 60 * 24 * 14);
 
         AuthStatusDto authStatusDto = new AuthStatusDto(true, userInfo);
@@ -73,7 +74,6 @@ public class AuthController {
         });
 
         // 쿠키의 유효기간을 0으로 설정
-        cookieUtil.deleteCookie(response, "accessToken");
         cookieUtil.deleteCookie(response, "refreshToken");
 
         return ResponseEntity.ok("로그아웃 되었습니다.");
@@ -89,8 +89,8 @@ public class AuthController {
         // 서비스를 호출하여 새로운 액세스 토큰을 발급
         String newAccessToken = authService.reissue(refreshToken);
 
-        // 응답 헤더에 새로운 액세스 토큰을 쿠키로 추가
-        cookieUtil.addCookie(response, "accessToken", newAccessToken, 60 * 30);
+        // 응답 헤더에 새로운 액세스 토큰을 추가
+        response.addHeader("Authorization", "Bearer " + newAccessToken);
 
         return ResponseEntity.ok("액세스 토큰이 성공적으로 재발급되었습니다.");
     }
