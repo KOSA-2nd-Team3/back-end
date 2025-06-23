@@ -1,20 +1,22 @@
 package kosa.server.board.controller;
 
-import kosa.server.board.dto.response.PlatformPeopleSortDto;
-import kosa.server.board.dto.response.PlatformPostResponseDto;
-import kosa.server.board.dto.response.PlatformCategoryDto;
-import kosa.server.board.dto.response.PlatformSortResponseDto;
+import kosa.server.board.dto.request.SubscriptionCreateDto;
+import kosa.server.board.dto.response.*;
 import kosa.server.board.service.PlatformService;
 import kosa.server.board.service.PostService;
+import kosa.server.common.security.user.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/list")
 @RequiredArgsConstructor
@@ -69,5 +71,30 @@ public class PlatformController {
     public ResponseEntity<List<PlatformSortResponseDto>> getPriceByPlatform() {
         List<PlatformSortResponseDto> PriceByPlatform = platformService.getStatusOrderByPrice();
         return new ResponseEntity<>(PriceByPlatform, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/subscription")
+    public ResponseEntity<?> getPlatform(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String loginId = customUserDetails.getUsername();
+        log.info("GET /subscription 요청: loginId={}", loginId);
+        List<PlatformResponseDto> platformListDto = platformService.getPlatformList();
+
+        return new ResponseEntity<>(platformListDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/platforms/{platformId}")
+    public ResponseEntity<?> getPlatformById(@PathVariable Long platformId,
+                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String loginId = customUserDetails.getUsername();
+        log.info("GET /subscription 요청: loginId={}", loginId);
+        PlatformResponseDto platformDto = platformService.getPlatform(platformId);
+        return new ResponseEntity<>(platformDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/subscription")
+    public ResponseEntity<?> createSubscription(@RequestBody SubscriptionCreateDto subscriptionCreateDto) {
+        Long platformId = subscriptionCreateDto.getPlatformId();
+        PlatformResponseDto platformDto = platformService.getPlatform(platformId);
+        return new ResponseEntity<>(platformDto, HttpStatus.OK);
     }
 }

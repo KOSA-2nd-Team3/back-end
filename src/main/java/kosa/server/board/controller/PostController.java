@@ -1,5 +1,6 @@
 package kosa.server.board.controller;
 
+import kosa.server.board.dto.request.LeaveMyPostRequestDto;
 import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/post")
 @RequiredArgsConstructor
 public class PostController {
@@ -24,7 +25,7 @@ public class PostController {
     private final MemberService memberService;
 
     // 방 생성
-    @PostMapping("/create")
+    @PostMapping("/subscription/create")
     public ResponseEntity<?> create(@RequestBody PostCreateRequestDto request) {
         postService.create(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -59,16 +60,16 @@ public class PostController {
     }
 
     // 생성된 방 중에서 원하는 방 join 클릭 시, 파티원으로 저장
-    @PostMapping("/{postId}/join")
-    public ResponseEntity<?> joinParty(@PathVariable("postId") Long postId, @RequestBody String loginId) {
+    @PostMapping("/joinParty")
+    public ResponseEntity<?> joinParty(@RequestBody Long postId, @RequestBody String loginId) {
         postService.joinParty(loginId, postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // 파티원일때, 파티방 삭제
-    @PostMapping("/myPage/{postId}/leave")
-    public ResponseEntity<?> leaveMyPost(@PathVariable Long postId, @RequestBody String loginId) {
-        postService.leaveMyPost(postId, loginId);
+    @PostMapping("/leaveMyPost")
+    public ResponseEntity<?> leaveMyPost(@RequestBody LeaveMyPostRequestDto request) {
+        postService.leaveMyPost(request.getPostId(), request.getLoginId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

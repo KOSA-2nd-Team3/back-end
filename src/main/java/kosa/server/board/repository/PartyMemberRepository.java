@@ -11,4 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PartyMemberRepository extends JpaRepository<PartyMember, Long> {
     Optional<PartyMember> findByPostAndMember(Post post, Member member);
+
+    void deleteAllByPost_Id(Long postId);
+    void deleteByPost_IdAndMember_Id(Long postId, Long memberId);
 }

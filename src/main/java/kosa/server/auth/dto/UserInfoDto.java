@@ -10,4 +10,5 @@ public class UserInfoDto {
     private String loginId;
     private String role;
 
+
 }

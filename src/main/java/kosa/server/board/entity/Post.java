@@ -16,9 +16,9 @@ import java.util.List;
 public class Post extends BaseEntity {
 
     @Id
-    @Column(name = "post_id" , unique = true, nullable=false)
+    @Column(unique = true, nullable=false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "platform_id")
@@ -31,6 +31,9 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<PartyMember> partyMember = new ArrayList<>();
 
+//    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
+//    private ChatRoom chatRoom;
+
     @Setter
     @Column(name = "current_count", nullable=false)
     private int currentCount;
@@ -41,17 +44,18 @@ public class Post extends BaseEntity {
     @Column(name = "duration_month" , nullable=false)
     private int durationMonth;
 
-    @Column(name = "host_id", nullable=false)
+    @Column(name = "host_id")
     private String hostId;
 
-    @Column(name = "host_pwd", nullable=false)
+    @Column(name = "host_pwd")
     private String hostPwd;
 
     @Column(name = "is_expired", nullable = false)
     private String isExpired;
 
-//    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
-//    private ChatRoom chatRoom;
+    public void addPartyMember(PartyMember partyMember) {
+        this.partyMember.add(partyMember);
+    }
 
     @Builder
     public Post(Platform platform, Member member, int current_count, int partySize, int durationMonth , String hostId, String hostPwd, String isExpired) {

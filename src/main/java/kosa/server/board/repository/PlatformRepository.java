@@ -20,7 +20,7 @@ public interface PlatformRepository extends JpaRepository<Platform, Long> {
             "GROUP BY p.id, p.name, p.price, p.capacity")
     List<Object[]> countPostStatsByPlatform();
 
-    @Query("SELECT post.postId, p.name, post.member.id, p.price, post.partySize, post.currentCount " +
+    @Query("SELECT post.id, p.name, post.member.id, p.price, post.partySize, post.currentCount " +
             "FROM Post post JOIN post.platform p "+
             "WHERE p.name = :platformName")
     List<Object[]> findPostStatsWithPlatform(@Param("platformName") String platformName);

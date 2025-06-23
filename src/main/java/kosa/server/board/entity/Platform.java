@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,10 +13,10 @@ import java.util.List;
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique=true)
+    @Column(name = "platform_id", unique=true, nullable = false)
     private Long id;
 
-    @Column(unique=true, nullable=false)
+    @Column(nullable=false)
     private String name;
 
     @Column(nullable=false)
@@ -26,13 +25,12 @@ public class Platform {
     @Column(nullable=false)
     private BigDecimal price;
 
-    @Column(unique=true, nullable=false)
+    @Column(nullable = false)
     private int category;
 
-    @Column(name = "image_url", nullable=false)
-    private String imageUrl;
+    @Column(nullable = false)
+    private int monthUnit;
 
     @OneToMany(mappedBy = "platform")
-    private List<Post> post = new ArrayList<>();
+    private List<Post> post;
 }
-
