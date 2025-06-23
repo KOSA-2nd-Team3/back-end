@@ -34,6 +34,8 @@ public class PlatformService {
                         .platformName(platform.getName())
                         .price(platform.getPrice())
                         .category(platform.getCategory())
+                        .capacity(platform.getCapacity())
+                        .imageUrl(platform.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -47,6 +49,8 @@ public class PlatformService {
                         .platformName(platform.getName())
                         .price(platform.getPrice())
                         .category(platform.getCategory())
+                        .capacity(platform.getCapacity())
+                        .imageUrl(platform.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
     }

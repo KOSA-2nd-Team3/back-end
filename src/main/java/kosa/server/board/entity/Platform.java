@@ -26,7 +26,7 @@ public class Platform {
     @Column(nullable=false)
     private BigDecimal price;
 
-    @Column(unique=true, nullable=false)
+    @Column(nullable=false)
     private int category;
 
     @Column(name = "image_url", nullable=false)

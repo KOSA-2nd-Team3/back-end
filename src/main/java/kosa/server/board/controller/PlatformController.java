@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/list")
+@RequestMapping("/api/list")
 @RequiredArgsConstructor
 public class PlatformController {
 

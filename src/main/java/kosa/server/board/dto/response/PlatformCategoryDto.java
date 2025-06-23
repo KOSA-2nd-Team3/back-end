@@ -12,4 +12,6 @@ public class PlatformCategoryDto {
     private String platformName;
     private BigDecimal price;
     private int category;
+    private int capacity;
+    private String imageUrl;
 }
