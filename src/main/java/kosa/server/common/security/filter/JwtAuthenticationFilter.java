@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kosa.server.common.security.jwt.JwtProvider;
 import kosa.server.common.security.service.CustomUserDetailsService;
-import kosa.server.common.security.user.CustomUserDetails;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String loginId = jwtProvider.getLoginId(accessToken);
 
             // loginId로 CustomUserDetailsService를 통해 DB에서 사용자 정보 조회
-            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(loginId);
+            CustomUserPrincipal userDetails = (CustomUserPrincipal) customUserDetailsService.loadUserByUsername(loginId);
 
             if (userDetails != null) {
                 Authentication authentication =

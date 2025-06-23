@@ -20,7 +20,7 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false, length = 50)
     private String loginId; // 실제 로그인 ID
 
-    @Column(nullable = false)
+    //Social Login 시 password 없음
     private String password;
 
     @Column(unique = true, nullable = false, length = 50)

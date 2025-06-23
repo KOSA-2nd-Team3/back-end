@@ -11,7 +11,7 @@ import kosa.server.auth.dto.LoginRequestDto;
 import kosa.server.auth.dto.UserInfoDto;
 import kosa.server.auth.service.AuthService;
 import kosa.server.common.code.ErrorCode;
-import kosa.server.common.security.user.CustomUserDetails;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
 import kosa.server.member.exception.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +74,7 @@ public class AuthController {
 
     // 상태 확인 엔드포인트
     @GetMapping("/status")
-    public ResponseEntity<AuthStatusDto> getAuthStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<AuthStatusDto> getAuthStatus(@AuthenticationPrincipal CustomUserPrincipal userDetails) {
         // 인증 객체 있으면 유저인포 만들어서 리턴
         if (userDetails != null) {
             UserInfoDto userInfo = new UserInfoDto(
