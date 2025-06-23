@@ -37,7 +37,8 @@ public class AuthController {
         String refreshToken = (String) authData.get("refreshToken");
         UserInfoDto userInfo = (UserInfoDto) authData.get("userInfo");
 
-        cookieUtil.addCookie(response, "accessToken", accessToken, 30 * 60);
+        response.addHeader("Authorization", "Bearer " + accessToken);
+//        cookieUtil.addCookie(response, "accessToken", accessToken, 30 * 60);
         cookieUtil.addCookie(response, "refreshToken", refreshToken, 60 * 60 * 24 * 14);
 
         AuthStatusDto authStatusDto = new AuthStatusDto(true, userInfo);

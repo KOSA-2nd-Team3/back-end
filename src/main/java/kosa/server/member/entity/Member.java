@@ -64,4 +64,7 @@ public class Member extends BaseEntity {
         refreshToken.setMember(this);
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
