@@ -2,7 +2,6 @@ package kosa.server.common.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kosa.server.common.security.jwt.JwtProvider;
@@ -45,9 +44,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 토큰 가져오고 없으면 null
-        String accessToken = cookieUtil.getCookie(request, "accessToken")
-                .map(Cookie::getValue)
-                .orElse(null);
+//        String accessToken = cookieUtil.getCookie(request, "accessToken")
+//                .map(Cookie::getValue)
+//                .orElse(null);
+        String jwtToken = request.getHeader("Authorization");
+        String accessToken = null;
+
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+            accessToken = jwtToken.substring(7); // "Bearer " 제거
+        }
+
 
         // validateToken으로 토큰 유효성 검사
         // 토큰이 존재하고, 유효하다면

@@ -2,12 +2,15 @@ server:
   port: 8080
 
 spring:
+  config:
+    activate:
+      on-profile: test
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: ${username}
-    password: ${dbpassword}
-
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    # 위는 H2 메모리 DB 기본값
   mail:
     host: smtp.test.com
     port: 587
@@ -19,37 +22,15 @@ spring:
           auth: true
           starttls:
             enable: true
-
-
-  # JPA & Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto:
+      ddl-auto: create
+    show-sql: true
     properties:
       hibernate:
-        show_sql: true # 실행되는 SQL 쿼리를 로그로 보여줍니다.
-        format_sql: true # SQL 쿼리를 보기 좋게 정렬해줍니다.
-        default_batch_fetch_size: 100 # N+1 문제 해결을 위한 옵션
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
-  # JWT 시크릿 키 (기존 설정)
-  jwt:
-    secret: 'ylWNT6xLqUg/K2pcfxlwumvsJ4UWRmF3SVh/wufsS2E='
+  sql:
+    init:
+      mode: never
 
-# MyBatis 설정
-#mybatis:
-#  # DB의 snake_case 컬럼명을 Java의 camelCase 필드명으로 자동 매핑해줍니다.
-#  configuration:
-#    map-underscore-to-camel-case: true
-#  # MyBatis 매퍼 XML 파일의 위치를 지정합니다.
-#  mapper-locations: classpath:mappers/**/*.xml
-
-# 로깅 레벨 설정
-logging:
-  level:
-    # 우리가 만든 애플리케이션 패키지의 로그 레벨을 DEBUG로 설정하여 더 자세한 로그를 봅니다.
-    kosa.server: DEBUG
-    # Hibernate가 실행하는 SQL을 DEBUG 레벨로 로깅합니다. (show_sql: true 와 유사)
-    org.hibernate.SQL: DEBUG
-    # SQL에 바인딩되는 파라미터 값을 TRACE 레벨로 로깅합니다. (매우 유용함)
-    org.hibernate.orm.jdbc.bind: TRACE

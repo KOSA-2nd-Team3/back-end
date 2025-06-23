@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByLoginId(String loginId);
-
+//  Optional<Member> findByName(String name);
     @Query("SELECT m FROM Member m JOIN FETCH m.role WHERE m.loginId = :loginId")
     Optional<Member> findByLoginIdWithRole(@Param("loginId") String loginId);
 
