@@ -4,7 +4,7 @@ import kosa.server.board.dto.request.SubscriptionCreateDto;
 import kosa.server.board.dto.response.*;
 import kosa.server.board.service.PlatformService;
 import kosa.server.board.service.PostService;
-import kosa.server.common.security.user.CustomUserDetails;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
@@ -14,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,6 +30,7 @@ public class PlatformController {
         List<PlatformCategoryDto> allPlatform = platformService.getAllPlatforms();
         return new ResponseEntity<>(allPlatform, HttpStatus.OK);
     }
+
     // 메인 페이지에서 카테고리 클릭
     @GetMapping("/category/{category}")
     public ResponseEntity<List<PlatformCategoryDto>> getPlatformsByCategory(@PathVariable("category") int category) {
@@ -74,7 +74,7 @@ public class PlatformController {
     }
 
     @GetMapping("/api/subscription")
-    public ResponseEntity<?> getPlatform(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<?> getPlatform(@AuthenticationPrincipal CustomUserPrincipal customUserDetails) {
         String loginId = customUserDetails.getUsername();
         log.info("GET /subscription 요청: loginId={}", loginId);
         List<PlatformResponseDto> platformListDto = platformService.getPlatformList();
@@ -84,7 +84,7 @@ public class PlatformController {
 
     @GetMapping("/api/platforms/{platformId}")
     public ResponseEntity<?> getPlatformById(@PathVariable Long platformId,
-                                             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                             @AuthenticationPrincipal CustomUserPrincipal customUserDetails) {
         String loginId = customUserDetails.getUsername();
         log.info("GET /subscription 요청: loginId={}", loginId);
         PlatformResponseDto platformDto = platformService.getPlatform(platformId);

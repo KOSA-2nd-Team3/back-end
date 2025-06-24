@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
     private List<Post> post = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<PartyMember> partyMember = new ArrayList<>();
+    private List<PartyMember> partyMembers = new ArrayList<>();
 
     @Builder
     private Member(String loginId, String password, String nickname, String name, String email, Role role, boolean enabled) {
@@ -63,6 +63,10 @@ public class Member extends BaseEntity {
     public void addRefreshToken(RefreshToken refreshToken) {
         this.refreshTokens.add(refreshToken);
         refreshToken.setMember(this);
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = true;
     }
 
     public void verifyEmail() {

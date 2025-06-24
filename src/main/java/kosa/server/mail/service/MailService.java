@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MailServiceImpl {
+public class MailService {
 
     @Qualifier("notificationMailSender")
     private final JavaMailSender notificationMailSender;
