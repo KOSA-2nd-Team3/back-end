@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/post/**").permitAll()
                         .requestMatchers("/list/**").permitAll()
-                        .requestMatchers("/*.png").permitAll()
+                        .requestMatchers("/*.png","/*.jpg" ).permitAll()
                         .anyRequest().authenticated());
         http
                 .sessionManagement((session) -> session
