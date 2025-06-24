@@ -6,5 +6,5 @@ import lombok.Data;
 public class SubscriptionCreateDto {
 
     private Long platformId;
-    private Long loginId;
+    private String loginId;
 }

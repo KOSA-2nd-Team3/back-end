@@ -61,8 +61,8 @@ public class Post extends BaseEntity {
     public Post(Platform platform, Member member, int current_count, int partySize, int durationMonth , String hostId, String hostPwd, String isExpired) {
         this.platform = platform;
         this.member = member;
-        this.currentCount = 1;
-        this.partySize = 1;
+        this.currentCount = current_count;
+        this.partySize = partySize;
         this.durationMonth = durationMonth;
         this.hostId = hostId;
         this.hostPwd = hostPwd;

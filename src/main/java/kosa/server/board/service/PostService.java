@@ -54,6 +54,7 @@ public class PostService {
                 .current_count(request.getCurrentCount())
                 .partySize(request.getCapacity())
                 .durationMonth(createPlatform.getMonthUnit())
+                .isExpired("Y")
                 .build();
 
         PartyMember partyMember = PartyMember.builder()

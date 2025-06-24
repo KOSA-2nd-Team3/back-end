@@ -73,7 +73,7 @@ public class PlatformController {
         return new ResponseEntity<>(PriceByPlatform, HttpStatus.OK);
     }
 
-    @GetMapping("/api/subscription")
+    @GetMapping("/subscription")
     public ResponseEntity<?> getPlatform(@AuthenticationPrincipal CustomUserPrincipal customUserDetails) {
         String loginId = customUserDetails.getUsername();
         log.info("GET /subscription 요청: loginId={}", loginId);
@@ -82,7 +82,7 @@ public class PlatformController {
         return new ResponseEntity<>(platformListDto, HttpStatus.OK);
     }
 
-    @GetMapping("/api/platforms/{platformId}")
+    @GetMapping("/platforms/{platformId}")
     public ResponseEntity<?> getPlatformById(@PathVariable Long platformId,
                                              @AuthenticationPrincipal CustomUserPrincipal customUserDetails) {
         String loginId = customUserDetails.getUsername();
@@ -91,7 +91,7 @@ public class PlatformController {
         return new ResponseEntity<>(platformDto, HttpStatus.OK);
     }
 
-    @PostMapping("/api/subscription")
+    @PostMapping("/subscription")
     public ResponseEntity<?> createSubscription(@RequestBody SubscriptionCreateDto subscriptionCreateDto) {
         Long platformId = subscriptionCreateDto.getPlatformId();
         PlatformResponseDto platformDto = platformService.getPlatform(platformId);
