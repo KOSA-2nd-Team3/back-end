@@ -5,6 +5,7 @@ import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
 import kosa.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,13 @@ public class PostController {
     public ResponseEntity<?> leaveMyPost(@RequestBody LeaveMyPostRequestDto request) {
         postService.leaveMyPost(request.getPostId(), request.getLoginId());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 플랫폼 별 파티 리스트 가져오기
+    @GetMapping("/platform/{platformId}")
+    public ResponseEntity<List<PlatformPostResponseDto>> platformPostList(@PathVariable Long platformId) {
+        List<PlatformPostResponseDto> platformPostResponseDtos = postService.platformPostList(platformId);
+        return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
     }
 
 }

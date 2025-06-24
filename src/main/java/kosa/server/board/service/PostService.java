@@ -21,8 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -196,7 +198,6 @@ public class PostService {
                 .platformName(post.getPlatform().getName())
                 .partySize(post.getPartySize())
                 .currentCount(post.getCurrentCount())
-                .memberName(post.getMember().getName())
                 .postId(post.getId())
                 .isExpired(post.getIsExpired())
                 .build());
@@ -242,5 +243,18 @@ public class PostService {
                 .build();
     }
 
+    public List<PlatformPostResponseDto> platformPostList(Long platformId) {
+        List<Post> findPostList = postRepository.findByPlatformId(platformId);
 
+        return findPostList.stream().map(post -> PlatformPostResponseDto.builder()
+                .postId(post.getId())
+                .leaderName(post.getMember().getName())
+                .platformName(post.getPlatform().getName())
+                .platformPrice(post.getPlatform().getPrice().longValue())
+                .monthUnit(post.getPlatform().getMonthUnit())
+                .currentCount(post.getCurrentCount())
+                .partySize(post.getPartySize())
+                .isExpired(post.getIsExpired())
+                .build()).toList();
+    }
 }

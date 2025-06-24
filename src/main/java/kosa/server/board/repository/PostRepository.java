@@ -17,8 +17,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT DISTINCT p FROM Post p JOIN p.partyMember pm WHERE pm.member.id = :memberId")
     Page<Post> findPostsByPartyMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
-
     //PlatForm, Member 사용
     Page<Post> findPostByPlatformName(String platformName, Pageable pageable);
+
+    List<Post> findByPlatformId(Long platformId);
 
 }

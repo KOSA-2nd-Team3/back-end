@@ -6,11 +6,13 @@ import lombok.Data;
 @Data
 @Builder
 public class PlatformPostResponseDto {
+    private Long postId;
+    private String leaderName;
     private String platformName;
-    private int partySize;
+    private Long platformPrice;
+    private int monthUnit;
     private int currentCount;
-    private String memberName;
+    private int partySize;
     private String isExpired;
 
-    private Long postId;
 }
