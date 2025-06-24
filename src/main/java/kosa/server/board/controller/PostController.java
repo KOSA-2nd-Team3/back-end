@@ -1,6 +1,7 @@
 package kosa.server.board.controller;
 
 import kosa.server.board.dto.request.LeaveMyPostRequestDto;
+import kosa.server.board.dto.request.PartyJoinRequestDto;
 import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
@@ -27,9 +28,9 @@ public class PostController {
 
     // 방 생성
     @PostMapping("/subscription/create")
-    public ResponseEntity<?> create(@RequestBody PostCreateRequestDto request) {
-        postService.create(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<Long> create(@RequestBody PostCreateRequestDto request) {
+        Long createPostId = postService.create(request);
+        return new ResponseEntity<>(createPostId, HttpStatus.CREATED);
     }
 
     // 방 수정
@@ -62,8 +63,8 @@ public class PostController {
 
     // 생성된 방 중에서 원하는 방 join 클릭 시, 파티원으로 저장
     @PostMapping("/joinParty")
-    public ResponseEntity<?> joinParty(@RequestBody Long postId, @RequestBody String loginId) {
-        postService.joinParty(loginId, postId);
+    public ResponseEntity<?> joinParty(@RequestBody PartyJoinRequestDto request) {
+        postService.joinParty(request.getLoginId(), request.getPostId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

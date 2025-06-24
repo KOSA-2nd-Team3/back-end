@@ -2,6 +2,7 @@ package kosa.server.board.entity;
 
 import jakarta.persistence.*;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.chat.entity.ChatRoom;
 import kosa.server.common.BaseEntity;
 import kosa.server.member.entity.Member;
 import lombok.*;
@@ -31,8 +32,8 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<PartyMember> partyMember = new ArrayList<>();
 
-//    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
-//    private ChatRoom chatRoom;
+    @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private ChatRoom chatRoom;
 
     @Setter
     @Column(name = "current_count", nullable=false)

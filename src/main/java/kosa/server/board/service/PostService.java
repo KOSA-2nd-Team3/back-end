@@ -42,7 +42,7 @@ public class PostService {
     private final PartyMemberRepository partyMemberRepository;
     private final MemberJpaRepository memberJpaRepository;
 
-    public void create(PostCreateRequestDto request) {
+    public Long create(PostCreateRequestDto request) {
         //dto를 post로 변환
         Platform createPlatform = platformRepository.findById(request.getPlatformId())
                 .orElseThrow(() -> new RuntimeException("플랫폼을 찾을 수 없습니다."));
@@ -70,6 +70,8 @@ public class PostService {
         platformRepository.save(createPlatform);
         postRepository.save(createPost);
         partyMemberRepository.save(partyMember);
+
+        return createPost.getId();
     }
 
     public void update(PostUpdateRequestDto request) {
@@ -89,12 +91,12 @@ public class PostService {
             editor.hostId(request.getHostId());
         }
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
-        if (request.getCapacity() != -1) {
-            editor.capacity(request.getCapacity());
-        }
-        if (request.getDurationMonth() != -1) {
-            editor.durationMonth(request.getDurationMonth());
-        }
+//        if (request.getCapacity() != -1) {
+//            editor.capacity(request.getCapacity());
+//        }
+//        if (request.getDurationMonth() != -1) {
+//            editor.durationMonth(request.getDurationMonth());
+//        }
         postToUpdate.edit(editor.build());
     }
 
@@ -142,7 +144,6 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
         Post post = postRepository.findById(postId)
                 .orElseThrow(()->new IllegalArgumentException("방이 존재하지 않습니다."));
-
 
         PartyMember partyMember = PartyMember.builder()
                 .post(post)
