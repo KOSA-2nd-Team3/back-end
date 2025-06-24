@@ -66,7 +66,7 @@ public class Member extends BaseEntity {
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = true;
+        this.enabled = enabled;
     }
 
     public void verifyEmail() {

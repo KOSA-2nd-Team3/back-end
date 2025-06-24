@@ -109,7 +109,7 @@ public class AuthService {
         tokenRepository.save(verificationToken);
 
         // 이메일 전송
-        String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
+        String verificationLink = "http://localhost:8080/api/auth/login/verify?token=" + token;
 
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);

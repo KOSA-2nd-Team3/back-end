@@ -62,7 +62,7 @@ public class SecurityConfig {
         // 인증 엔드포인트 설정
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue","/oauth2/**", "/api/auth/verify", "/api/auth/send-verification-email", "/connect", "/connect/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue","/oauth2/**", "/api/auth/login/verify", "/api/auth/send-verification-email", "/connect", "/connect/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/post/**").permitAll()
                         .requestMatchers("/list/**").permitAll()

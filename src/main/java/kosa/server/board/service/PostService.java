@@ -4,7 +4,7 @@ import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
-import kosa.server.board.dto.response.PartyMemberDto;
+import kosa.server.board.dto.response. PartyMemberDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;

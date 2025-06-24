@@ -57,15 +57,15 @@ public class AuthController {
     }
 
     // 이메일 인증 토큰 확인용 엔드포인트 (예: GET /api/auth/verify?token=...)
-    @GetMapping("/verify")
+    @GetMapping("/login/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam String token) {
         boolean verified = authService.verifyEmailToken(token);
 
         URI redirectUri;
         if (verified) {
-            redirectUri = URI.create("http://localhost:5173/?verified=true");
+            redirectUri = URI.create("http://localhost:5173/login/?verified=true");
         } else {
-            redirectUri = URI.create("http://localhost:5173/verify-failed");
+            redirectUri = URI.create("http://localhost:5173/login/verify-failed");
         }
 
         HttpHeaders headers = new HttpHeaders();
