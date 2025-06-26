@@ -1,11 +1,8 @@
 package kosa.server.board.service;
 
+import kosa.server.board.dto.response.*;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
-import kosa.server.board.dto.response.MyPostOneResponseDto;
-import kosa.server.board.dto.response.MyPostResponseDto;
-import kosa.server.board.dto.response.PartyMemberDto;
-import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
@@ -87,12 +84,12 @@ public class PostService {
             editor.hostId(request.getHostId());
         }
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
-//        if (request.getCapacity() != -1) {
-//            editor.capacity(request.getCapacity());
-//        }
-//        if (request.getDurationMonth() != -1) {
-//            editor.durationMonth(request.getDurationMonth());
-//        }
+        if (request.getCapacity() != 0) {
+            editor.capacity(request.getCapacity());
+        }
+        if (request.getDurationMonth() != 0) {
+            editor.durationMonth(request.getDurationMonth());
+        }
         postToUpdate.edit(editor.build());
     }
 
@@ -253,6 +250,16 @@ public class PostService {
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
                 .build()).toList();
+    }
+
+    public PlatformPostNullResponseDto platformPostNull(Long platformId) {
+        Platform platform = platformRepository.findById(platformId)
+                .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
+
+        return PlatformPostNullResponseDto.builder()
+                .platformName(platform.getName())
+                .platformPrice(platform.getPrice())
+                .build();
     }
 
     public int getActiveCount(String loginId) {

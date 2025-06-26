@@ -2,10 +2,11 @@ package kosa.server.board.controller;
 
 import kosa.server.board.dto.request.LeaveMyPostRequestDto;
 import kosa.server.board.dto.request.PartyJoinRequestDto;
-import kosa.server.board.dto.request.PostCreateRequestDto;
-import kosa.server.board.dto.request.PostUpdateRequestDto;
 import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
+import kosa.server.board.dto.request.PostCreateRequestDto;
+import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.board.dto.response.PlatformPostNullResponseDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
 import kosa.server.common.security.user.CustomUserPrincipal;
@@ -48,7 +49,6 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // todo @AuthenticationPrincipal
     // 내 페이지에서 내가 참여한 방 확인
     @GetMapping("/myPost")
     public ResponseEntity<Page<MyPostResponseDto>> myPost(@AuthenticationPrincipal CustomUserPrincipal principal,
@@ -85,6 +85,12 @@ public class PostController {
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
     }
 
+    @GetMapping("/platform/{platformId}/")
+    public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
+        PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
+        return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
+    }
+
     // 나의 모집중인 구인글 개수
     @GetMapping("/myPost/active")
     public ResponseEntity<?> myPostActive(@AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -92,4 +98,5 @@ public class PostController {
         int activeCount = postService.getActiveCount(loginId);
         return new ResponseEntity<>(activeCount, HttpStatus.OK);
     }
+
 }
