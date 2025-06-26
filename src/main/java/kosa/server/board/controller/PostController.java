@@ -84,6 +84,12 @@ public class PostController {
         List<PlatformPostResponseDto> platformPostResponseDtos = postService.platformPostList(platformId);
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
     }
+  
+   @GetMapping("/platform/{platformId}/")
+    public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
+        PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
+        return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
+    }
 
     // 나의 모집중인 구인글 개수
     @GetMapping("/myPost/active")
@@ -92,10 +98,5 @@ public class PostController {
         int activeCount = postService.getActiveCount(loginId);
         return new ResponseEntity<>(activeCount, HttpStatus.OK);
     }
-
-    @GetMapping("/platform/{platformId}/")
-    public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
-        PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
-        return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
-    }
+   
 }

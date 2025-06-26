@@ -265,4 +265,5 @@ public class PostService {
                 .platformPrice(platform.getPrice())
                 .build();
     }
+
 }
