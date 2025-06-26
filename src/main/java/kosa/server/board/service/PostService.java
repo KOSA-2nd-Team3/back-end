@@ -255,6 +255,7 @@ public class PostService {
                 .currentCount(post.getCurrentCount())
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
+                .createdAt(post.getCreatedAt())
                 .build()).toList();
     }
 }

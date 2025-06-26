@@ -3,6 +3,8 @@ package kosa.server.board.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 public class PlatformPostResponseDto {
@@ -14,5 +16,6 @@ public class PlatformPostResponseDto {
     private int currentCount;
     private int partySize;
     private String isExpired;
+    private LocalDateTime createdAt;
 
 }
