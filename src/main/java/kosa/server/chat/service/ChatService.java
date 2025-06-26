@@ -1,7 +1,9 @@
 package kosa.server.chat.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Post;
+import kosa.server.board.repository.PartyMemberRepository;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.chat.dto.*;
 import kosa.server.chat.entity.ChatMessage;
@@ -23,8 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -36,6 +40,7 @@ public class ChatService {
     private final ChatMessageJpaRepository chatMessageJpaRepository;
     private final ReadStatusJpaRepository readStatusJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final PartyMemberRepository partyMemberRepository;
     private final PostRepository postJpaRepository;
 
     public void saveMessage(Long roomId, ChatMessageDto chatMessageDto) {
@@ -94,17 +99,24 @@ public class ChatService {
         chatParticipantJpaRepository.save(chatParticipant);
     }
 
-    public List<ChatRoomListResDto> getGroupchatRooms() {
+    public List<ChatRoomListResDto> getMyGroupChatRooms(String loginId) {
+        // 로그인 아이디 검증(조회)
+        memberJpaRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
         // 그룹 채팅방 조회
-        List<ChatRoom> chatRooms = chatRoomJpaRepository.findByIsGroupChat("Y");
+        List<ChatRoom> chatRooms = chatRoomJpaRepository.findByIsGroupChatAndLoginId("Y", loginId);
 
         // 리스트 만든 후 담아서 리턴
         List<ChatRoomListResDto> dtos = new ArrayList<>();
         for (ChatRoom c : chatRooms) {
+            Long count = readStatusJpaRepository.countByChatRoom_IdAndMember_LoginIdAndIsReadFalse(c.getId(), loginId);
             ChatRoomListResDto dto = ChatRoomListResDto.builder()
+                    .leaderId(c.getPost().getMember().getLoginId())
                     .roomId(c.getId())
                     .roomName(c.getName())
                     .serviceName(c.getPost().getPlatform().getName())
+                    .unreadCount(count)
                     .createdAt(c.getCreatedAt())
                     .build();
 
@@ -132,8 +144,6 @@ public class ChatService {
         if (!participant.isPresent()) {
             addParticipantToRoom(chatRoom, member);
         }
-
-
     }
 
     // ChatParticipant 객체 생성 후 저장 (채팅방에 멤버 추가)
@@ -214,11 +224,11 @@ public class ChatService {
         List<ChatParticipant> chatParticipant = chatParticipantJpaRepository.findAllByMember(member);
         List<MyChatListResDto> dtos = new ArrayList<>();
         for (ChatParticipant c : chatParticipant) {
-            Long count = readStatusJpaRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), member);
+//            Long count = readStatusJpaRepository.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), member);
             MyChatListResDto dto = MyChatListResDto.builder()
                     .roomId(c.getChatRoom().getId())
                     .roomName(c.getChatRoom().getName())
-                    .unReadCount(count)
+//                    .unReadCount(count)
                     .build();
             dtos.add(dto);
         }
@@ -270,6 +280,21 @@ public class ChatService {
         addParticipantToRoom(newRoom, otherMember);
 
         return newRoom.getId();
+    }
+
+    public List<PartyMemberResponseDto> chatRoomMemberList(Long roomId) {
+        // RoomId 검증 작업
+        chatRoomJpaRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
+
+        // Fetch 조인으로 가져온 뒤 PartyMemberResponseDto List 생성
+        return partyMemberRepository.findByChatRoomId(roomId)
+                .stream()
+                .map(partyMember -> PartyMemberResponseDto.builder()
+                        .loginId(partyMember.getMember().getLoginId())
+                        .leaderYn(partyMember.getIsOwner())
+                        .build())
+                .toList();
     }
 
 }
