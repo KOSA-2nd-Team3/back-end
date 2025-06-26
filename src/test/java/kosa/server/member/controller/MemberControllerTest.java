@@ -1,6 +1,6 @@
 package kosa.server.member.controller;
 
-import kosa.server.common.security.user.CustomUserDetails;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.member.dto.response.ProfileResponseDto;
 import kosa.server.member.entity.Member;
 import kosa.server.member.entity.Role;
@@ -31,7 +31,7 @@ class MemberControllerTest {
     @Autowired
     private MemberService memberService;  // @MockBean 대신 수동 등록
 
-    private CustomUserDetails customUserDetails;
+    private CustomUserPrincipal customUserDetails;
 
     @TestConfiguration
      static class TestConfig {
@@ -51,7 +51,7 @@ class MemberControllerTest {
                 .nickname("nick1")
                 .email("email")
                 .build();
-        customUserDetails = new CustomUserDetails(member);
+        customUserDetails = new CustomUserPrincipal(member);
     }
 
     @Test
