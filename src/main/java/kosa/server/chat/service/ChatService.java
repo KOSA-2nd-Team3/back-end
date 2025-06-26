@@ -73,11 +73,11 @@ public class ChatService {
         }
     }
 
-    public void createGroupRoom(ChatRoomCreateDto chatRoomCreateDto) {
+    public void createGroupRoom(ChatRoomCreateDto chatRoomCreateDto, String loginId) {
 //        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
 //                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
+        Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Post findPost = postJpaRepository.findById(chatRoomCreateDto.getPostId())
