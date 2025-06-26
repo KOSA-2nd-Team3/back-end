@@ -74,9 +74,6 @@ public class ChatService {
     }
 
     public void createGroupRoom(ChatRoomCreateDto chatRoomCreateDto, String loginId) {
-//        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
-//                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -126,13 +123,13 @@ public class ChatService {
         return dtos;
     }
 
-    public void addParticipantToGroupChat(Long roomId) {
+    public void addParticipantToGroupChat(Long roomId, String loginId) {
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         // 멤버 조회
-        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
+        Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         if(chatRoom.getIsGroupChat().equals("N")) {
@@ -155,14 +152,14 @@ public class ChatService {
         chatParticipantJpaRepository.save(chatParticipant);
     }
 
-    public List<ChatMessageResDto> getChatHistory(Long roomId) {
+    public List<ChatMessageResDto> getChatHistory(Long roomId, String loginId) {
         // 내가 해당 채팅방의 참여자가 아닐경우 에러
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
 
         // 멤버 조회
-        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
+        Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
 
         List<ChatParticipant> chatParticipants = chatParticipantJpaRepository.findByChatRoom(chatRoom);
@@ -202,13 +199,13 @@ public class ChatService {
         return false;
     }
 
-    public void messageRead(Long roomId) {
+    public void messageRead(Long roomId, String loginId) {
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
 
         // 멤버 조회
-        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
+        Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
 
         // 채팅룸, 멤버별 읽음여부 채팅 조회
@@ -235,13 +232,13 @@ public class ChatService {
         return dtos;
     }
 
-    public void leaveChatRoom(Long roomId) {
+    public void leaveChatRoom(Long roomId, String loginId) {
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
 
         // 멤버 조회
-        Member member = memberJpaRepository.findByLoginId(SecurityContextHolder.getContext().getAuthentication().getName())
+        Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
         if (chatRoom.getIsGroupChat().equals("N")) {
             throw new IllegalArgumentException("단체 채팅방이 아닙니다.");

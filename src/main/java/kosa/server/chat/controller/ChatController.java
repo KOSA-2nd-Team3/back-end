@@ -39,31 +39,35 @@ public class ChatController {
 
     // 그룹채팅방 참여 API
     @PostMapping("/room/group/{roomId}/join")
-    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long roomId) {
+    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long roomId,
+                                               @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/join 요청");
-        chatService.addParticipantToGroupChat(roomId);
+        chatService.addParticipantToGroupChat(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
     // 이전 메시지 조회
     @GetMapping("/api/chat/history/{roomId}")
-    public ResponseEntity<?> getChatHistory(@PathVariable Long roomId) {
+    public ResponseEntity<?> getChatHistory(@PathVariable Long roomId,
+                                            @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/api/chat/history/{roomId} 요청");
-        List<ChatMessageResDto> chatHistory = chatService.getChatHistory(roomId);
+        List<ChatMessageResDto> chatHistory = chatService.getChatHistory(roomId, customUserPrincipal.getName());
         return new ResponseEntity<>(chatHistory, HttpStatus.OK);
     }
 
     // 채팅 메시지 읽음 처리
     @PostMapping("/room/{roomId}/read")
-    public ResponseEntity<?> messageRead(@PathVariable Long roomId) {
+    public ResponseEntity<?> messageRead(@PathVariable Long roomId,
+                                         @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/{roomId}/read 요청");
-        chatService.messageRead(roomId);
+        chatService.messageRead(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
     // 채팅방 나가기
     @DeleteMapping("/room/group/{roomId}/leave")
-    public ResponseEntity<?> leaveGroupChatRoom(@PathVariable Long roomId) {
+    public ResponseEntity<?> leaveGroupChatRoom(@PathVariable Long roomId,
+                                                @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/leave 요청");
         chatService.leaveChatRoom(roomId);
         return ResponseEntity.ok().build();
@@ -71,7 +75,8 @@ public class ChatController {
 
     // 채팅방 나가기
     @DeleteMapping("/")
-    public ResponseEntity<?> chatRoomMembers(@PathVariable Long roomId) {
+    public ResponseEntity<?> chatRoomMembers(@PathVariable Long roomId,
+                                             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/api/chat/member/list 요청");
         chatService.leaveChatRoom(roomId);
         return ResponseEntity.ok().build();
