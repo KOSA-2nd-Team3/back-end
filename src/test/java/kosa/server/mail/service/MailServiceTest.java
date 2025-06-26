@@ -62,10 +62,10 @@ class MailServiceTest {
         Long fakePostId = 999L;
 
         // when
-        mailService.sendMail(members, platform, partySize, fakePostId);
+        mailService.prepareAndSendMail(fakePostId);
 
         // then
-        verify(mailService, times(1)).sendMail(members, platform, partySize, fakePostId);
+        verify(mailService, times(1)).prepareAndSendMail(fakePostId);
 
         verifyNoMoreInteractions(mailService);
     }

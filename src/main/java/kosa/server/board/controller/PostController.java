@@ -6,6 +6,7 @@ import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.board.dto.response.PlatformPostNullResponseDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
 import kosa.server.member.service.MemberService;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,6 +80,12 @@ public class PostController {
     public ResponseEntity<List<PlatformPostResponseDto>> platformPostList(@PathVariable Long platformId) {
         List<PlatformPostResponseDto> platformPostResponseDtos = postService.platformPostList(platformId);
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/platform/{platformId}/")
+    public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
+        PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
+        return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
     }
 
 }
