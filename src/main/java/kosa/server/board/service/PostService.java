@@ -199,8 +199,11 @@ public class PostService {
 
 
     public MyPostOneResponseDto selectParty(String loginId, Long postId) {
+        // postId 검증
         Post posts = postRepository.findById(postId)
                 .orElseThrow(()->new IllegalArgumentException("게시글이 없습니다."));
+
+        // loginId 검증
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
 
@@ -234,6 +237,7 @@ public class PostService {
                 .isOwner(isOwner)
                 .isExpired(posts.getIsExpired())
                 .members(members)
+                .platformImageUrl(posts.getPlatform().getImageUrl())
                 .build();
     }
 
