@@ -2,18 +2,19 @@ package kosa.server.board.controller;
 
 import kosa.server.board.dto.request.LeaveMyPostRequestDto;
 import kosa.server.board.dto.request.PartyJoinRequestDto;
-import kosa.server.board.dto.response.MyPostOneResponseDto;
-import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.board.dto.response.MyPostOneResponseDto;
+import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
+import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,17 +48,19 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // todo @AuthenticationPrincipal
     // 내 페이지에서 내가 참여한 방 확인
     @GetMapping("/myPost")
-    public ResponseEntity<Page<MyPostResponseDto>> myPost(@RequestParam String loginId) {
-        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(loginId);
+    public ResponseEntity<Page<MyPostResponseDto>> myPost(@AuthenticationPrincipal CustomUserPrincipal principal,
+                                                          @RequestParam(defaultValue = "0") int page) {
+        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(principal.getName(), page);
         return new ResponseEntity<>(myPostResponses, HttpStatus.OK);
     }
 
     // 내 페이지에서 내가 참여한 모든 방 중에 하나 선택 시, 해당 페이지 정보 출력
     @GetMapping("/myPost/{postId}")
-    public ResponseEntity<MyPostOneResponseDto> selectParty(@PathVariable("postId") Long postId, @RequestParam String loginId) {
-        MyPostOneResponseDto myPostOneResponse = postService.selectParty(loginId, postId);
+    public ResponseEntity<MyPostOneResponseDto> selectParty(@PathVariable("postId") Long postId, @AuthenticationPrincipal CustomUserPrincipal principal) {
+        MyPostOneResponseDto myPostOneResponse = postService.selectParty(principal.getName(), postId);
         return new ResponseEntity<>(myPostOneResponse, HttpStatus.OK);
     }
 
@@ -82,4 +85,11 @@ public class PostController {
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
     }
 
+    // 나의 모집중인 구인글 개수
+    @GetMapping("/myPost/active")
+    public ResponseEntity<?> myPostActive(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        String loginId = principal.getName();
+        int activeCount = postService.getActiveCount(loginId);
+        return new ResponseEntity<>(activeCount, HttpStatus.OK);
+    }
 }

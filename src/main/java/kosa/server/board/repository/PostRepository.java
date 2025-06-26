@@ -5,21 +5,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    //PlatForm 사용
-    @Query("SELECT DISTINCT p FROM Post p JOIN p.partyMember pm WHERE pm.member.id = :memberId")
-    Page<Post> findPostsByPartyMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.chatRoom cr WHERE p.member.id = :memberId", countQuery = "SELECT count (p.id) FROM Post p")
+    Page<Post> findPostsByMemberId(Long memberId, Pageable pageable);
+
+    @Query("SELECT count(p.id) FROM Post p WHERE p.member.loginId = :loginId AND p.isExpired = 'N'")
+    int activeCount(String loginId);
 
     //PlatForm, Member 사용
     Page<Post> findPostByPlatformName(String platformName, Pageable pageable);
 
     List<Post> findByPlatformId(Long platformId);
-
 }

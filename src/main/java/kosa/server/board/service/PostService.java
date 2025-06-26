@@ -1,10 +1,10 @@
 package kosa.server.board.service;
 
-import kosa.server.board.dto.response.MyPostOneResponseDto;
-import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
-import kosa.server.board.dto.response. PartyMemberDto;
+import kosa.server.board.dto.response.MyPostOneResponseDto;
+import kosa.server.board.dto.response.MyPostResponseDto;
+import kosa.server.board.dto.response.PartyMemberDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
@@ -21,15 +21,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -161,14 +157,14 @@ public class PostService {
         partyMemberRepository.save(partyMember);
     }
 
-    public Page<MyPostResponseDto> readMyPost(String loginId) {
+    public Page<MyPostResponseDto> readMyPost(String loginId, int page) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
 
         //몇 페이지, 몇 개, 정렬(기본은 최신순)
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        Page<Post> posts = postRepository.findPostsByPartyMemberId(member.getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+        Page<Post> posts = postRepository.findPostsByMemberId(member.getId(), pageRequest);
 
         return posts.map(post -> {
                 String isOwner = post.getPartyMember()
@@ -257,5 +253,9 @@ public class PostService {
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
                 .build()).toList();
+    }
+
+    public int getActiveCount(String loginId) {
+        return postRepository.activeCount(loginId);
     }
 }
