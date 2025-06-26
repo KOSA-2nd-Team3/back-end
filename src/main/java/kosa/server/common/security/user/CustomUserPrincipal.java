@@ -19,7 +19,7 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     private final String attributeKey;
     private final String registrationId;
 
-    //Form Login
+    //일반 Login 생성
     public CustomUserPrincipal(Member member) {
         this.member = member;
         this.attributes = null;
@@ -27,7 +27,7 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
         this.registrationId = null;
     }
 
-    //OAuth2
+    //OAuth2 생성
     public CustomUserPrincipal(Map<String, Object> attributes, String attributeKey, String registrationId) {
         this.member = null;
         this.attributes = attributes;
@@ -41,14 +41,18 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
         return Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getRoleName()));
     }
 
-    //OAuth2
+    //OAuth2 전용
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
     }
 
+    //loginId 반환
     @Override
     public String getName() {
+        if (registrationId == null) {
+            return member.getLoginId();
+        }
         switch (registrationId) {
             case "naver":
                 Map<String, Object> response = (Map<String, Object>) attributes.get(attributeKey);
@@ -62,7 +66,12 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
         }
     }
 
-    public String getUsernameFromOAuth2User() {
+    //name 반환
+    @Override
+    public String getUsername() {
+        if (registrationId == null) {
+            return member.getName();
+        }
         switch (registrationId) {
             case "google":
                 return (String) attributes.get("name");
@@ -111,12 +120,6 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     @Override
     public String getPassword() {
         return null;
-    }
-
-    @Override
-    public String getUsername() {
-        // 실제 ID로 사용되는 필드 반환 (예: memberName 또는 loginId)
-        return member.getLoginId();
     }
 
     @Override

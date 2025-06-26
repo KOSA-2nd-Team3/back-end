@@ -154,14 +154,14 @@ public class PostService {
         partyMemberRepository.save(partyMember);
     }
 
-    public Page<MyPostResponseDto> readMyPost(String loginId) {
+    public Page<MyPostResponseDto> readMyPost(String loginId, int page) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
 
         //몇 페이지, 몇 개, 정렬(기본은 최신순)
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        Page<Post> posts = postRepository.findPostsByPartyMemberId(member.getId(), pageRequest);
+        PageRequest pageRequest = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+        Page<Post> posts = postRepository.findPostsByMemberId(member.getId(), pageRequest);
 
         return posts.map(post -> {
                 String isOwner = post.getPartyMember()
@@ -252,6 +252,10 @@ public class PostService {
                 .build()).toList();
     }
 
+    public int getActiveCount(String loginId) {
+        return postRepository.activeCount(loginId);
+    }
+
     public PlatformPostNullResponseDto platformPostNull(Long platformId) {
         Platform platform = platformRepository.findById(platformId)
                 .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
@@ -261,6 +265,5 @@ public class PostService {
                 .platformPrice(platform.getPrice())
                 .build();
     }
-
 
 }
