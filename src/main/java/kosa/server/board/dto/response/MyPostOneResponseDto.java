@@ -27,5 +27,5 @@ public class MyPostOneResponseDto {
     //partyMember
     private Long memberId;
     private String isOwner;
-
+    private String platformImageUrl;
 }
