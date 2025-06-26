@@ -17,6 +17,8 @@ public class ChatRoomListResDto {
     private Long roomId;
     private String roomName;
     private String serviceName;
+    private String leaderId;
+    private Long unreadCount;
 
     @JsonFormat(pattern="yyyy.MM.dd")
     private LocalDateTime createdAt;

@@ -1,11 +1,8 @@
 package kosa.server.board.service;
 
-import kosa.server.board.dto.response.MyPostOneResponseDto;
-import kosa.server.board.dto.response.MyPostResponseDto;
+import kosa.server.board.dto.response.*;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
-import kosa.server.board.dto.response. PartyMemberDto;
-import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
@@ -21,15 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +35,7 @@ public class PostService {
     private final PartyMemberRepository partyMemberRepository;
     private final MemberJpaRepository memberJpaRepository;
 
-    public void create(PostCreateRequestDto request) {
+    public Long create(PostCreateRequestDto request) {
         //dto를 post로 변환
         Platform createPlatform = platformRepository.findById(request.getPlatformId())
                 .orElseThrow(() -> new RuntimeException("플랫폼을 찾을 수 없습니다."));
@@ -56,7 +49,7 @@ public class PostService {
                 .current_count(request.getCurrentCount())
                 .partySize(request.getCapacity())
                 .durationMonth(createPlatform.getMonthUnit())
-                .isExpired("Y")
+                .isExpired("N")
                 .build();
 
         PartyMember partyMember = PartyMember.builder()
@@ -70,6 +63,8 @@ public class PostService {
         platformRepository.save(createPlatform);
         postRepository.save(createPost);
         partyMemberRepository.save(partyMember);
+
+        return createPost.getId();
     }
 
     public void update(PostUpdateRequestDto request) {
@@ -89,10 +84,10 @@ public class PostService {
             editor.hostId(request.getHostId());
         }
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
-        if (request.getCapacity() != -1) {
+        if (request.getCapacity() != 0) {
             editor.capacity(request.getCapacity());
         }
-        if (request.getDurationMonth() != -1) {
+        if (request.getDurationMonth() != 0) {
             editor.durationMonth(request.getDurationMonth());
         }
         postToUpdate.edit(editor.build());
@@ -142,7 +137,6 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
         Post post = postRepository.findById(postId)
                 .orElseThrow(()->new IllegalArgumentException("방이 존재하지 않습니다."));
-
 
         PartyMember partyMember = PartyMember.builder()
                 .post(post)
@@ -258,4 +252,16 @@ public class PostService {
                 .createdAt(post.getCreatedAt())
                 .build()).toList();
     }
+
+    public PlatformPostNullResponseDto platformPostNull(Long platformId) {
+        Platform platform = platformRepository.findById(platformId)
+                .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
+
+        return PlatformPostNullResponseDto.builder()
+                .platformName(platform.getName())
+                .platformPrice(platform.getPrice())
+                .build();
+    }
+
+
 }
