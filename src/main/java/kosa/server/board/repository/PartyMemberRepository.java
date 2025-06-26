@@ -18,6 +18,8 @@ public interface PartyMemberRepository extends JpaRepository<PartyMember, Long> 
     void deleteAllByPost_Id(Long postId);
     void deleteByPost_IdAndMember_Id(Long postId, Long memberId);
 
+    List<PartyMember> findByPostId(Long postId);
+
     @Query("SELECT pm FROM PartyMember pm " +
             "JOIN FETCH pm.member " +
             "WHERE pm.post.id = (SELECT cr.post.id FROM ChatRoom cr WHERE cr.id = :roomId)")
