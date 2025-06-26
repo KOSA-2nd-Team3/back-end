@@ -84,6 +84,19 @@ public class ChatController {
         return new ResponseEntity<>(partyMemberResponseDtos, HttpStatus.OK);
     }
 
+    //    /api/chat/room-by-post/{postId}
+    @GetMapping("/api/chat/room-by-post/{postId}")
+    public ResponseEntity<?> chatRoomByPostId(@PathVariable Long postId,
+                                              @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
+
+        log.info("/api/chat/room-by-post/{postId} 요청");
+        Long findChatRoomId = chatService.ChatRoomIdByPostId(customUserPrincipal.getMember().getLoginId(), postId);
+        ChatRoomIdResponseDto dto = ChatRoomIdResponseDto.builder()
+                .chatRoomId(findChatRoomId)
+                .build();
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
     // 내 채팅방 목록 조회 : roomId, roomName, 그룹채팅여부, 메세지 읽음 개수
     /*@GetMapping("/my/rooms")
     public ResponseEntity<?> getMyChatRooms() {

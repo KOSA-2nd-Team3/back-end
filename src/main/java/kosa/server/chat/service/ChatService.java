@@ -297,4 +297,12 @@ public class ChatService {
                 .toList();
     }
 
+    public Long ChatRoomIdByPostId(String memberLoginId, Long postId) {
+        // postId 검증
+        ChatRoom findChatRoom = chatRoomJpaRepository.findByPostIdAndMemberLoginId(memberLoginId, postId)
+                .orElseThrow(() -> new EntityNotFoundException("post cannot be found"));
+
+        return findChatRoom.getId();
+    }
+
 }
