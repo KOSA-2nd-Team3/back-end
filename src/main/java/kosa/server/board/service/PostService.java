@@ -1,8 +1,8 @@
 package kosa.server.board.service;
 
-import kosa.server.board.dto.response.*;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
+import kosa.server.board.dto.response.*;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
@@ -14,10 +14,7 @@ import kosa.server.member.entity.Member;
 import kosa.server.member.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -271,4 +268,31 @@ public class PostService {
                 .build();
     }
 
+    public int getExpiredCount(String loginId) {
+        return postRepository.expiredCount(loginId);
+    }
+
+    public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page) {
+        Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+        Page<Post> posts = postRepository.findAllByPartyMemberLoginId(loginId, pageable);
+
+        return posts.map(post -> {
+            // isOwner 여부 확인
+            String isOwner = post.getPartyMember().stream()
+                    .filter(pm -> pm.getMember().getLoginId().equals(loginId))
+                    .findFirst()
+                    .map(PartyMember::getIsOwner)
+                    .orElse("N");
+
+            return MyPostResponseDto.builder()
+                    .postId(post.getId())
+                    .platformName(post.getPlatform().getName())
+                    .currentCount(post.getCurrentCount())
+                    .partySize(post.getPartySize())
+                    .price(post.getPlatform().getPrice().divide(BigDecimal.valueOf(post.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
+                    .isOwner(isOwner)
+                    .isExpired(post.getIsExpired())
+                    .build();
+        });
+    }
 }

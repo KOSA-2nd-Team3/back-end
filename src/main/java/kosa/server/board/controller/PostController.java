@@ -98,5 +98,22 @@ public class PostController {
         int activeCount = postService.getActiveCount(loginId);
         return new ResponseEntity<>(activeCount, HttpStatus.OK);
     }
-   
+
+    //나의 만료된 구인글 개수
+    @GetMapping("/myPost/expired")
+    public ResponseEntity<?> myPostExpired(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        String loginId = principal.getName();
+        int expiredCount = postService.getExpiredCount(loginId);
+        return new ResponseEntity<>(expiredCount, HttpStatus.OK);
+    }
+    //
+    // 내가 partyMember로 참여한 모든 Post 조회
+    @GetMapping("/myPost-join")
+    public ResponseEntity<Page<MyPostResponseDto>> getMyPartyPosts(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @RequestParam(defaultValue = "0") int page) {
+        String loginId = principal.getName();
+        Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(loginId, page);
+        return ResponseEntity.ok(result);
+    }
 }
