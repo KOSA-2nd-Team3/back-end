@@ -1,7 +1,6 @@
 package kosa.server.chat.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Post;
 import kosa.server.board.repository.PartyMemberRepository;
 import kosa.server.board.repository.PostRepository;
@@ -25,10 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -123,22 +120,22 @@ public class ChatService {
         return dtos;
     }
 
-    public void addParticipantToGroupChat(Long roomId, String loginId) {
+    public void addParticipantToGroupChat(Long postId, String loginId) {
         // 채팅방 조회
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
+        ChatRoom chatRoom = chatRoomJpaRepository.findByPostId(postId)
                 .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
         // 멤버 조회
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-        if(chatRoom.getIsGroupChat().equals("N")) {
+        if (chatRoom.getIsGroupChat().equals("N")) {
             throw new IllegalArgumentException("그룹 채팅이 아닙니다.");
         }
 
         // 이미 참여자 인지 검증
         Optional<ChatParticipant> participant = chatParticipantJpaRepository.findByChatRoomAndMember(chatRoom, member);
-        if (!participant.isPresent()) {
+        if (participant.isEmpty()) {
             addParticipantToRoom(chatRoom, member);
         }
     }

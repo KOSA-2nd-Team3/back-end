@@ -21,7 +21,8 @@ public class ChatController {
 
     // 그룹 채팅방 개설
     @PostMapping("/room/group/create")
-    public ResponseEntity<?> createGroupRoom(@RequestBody ChatRoomCreateDto chatRoomCreateDto, @AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<?> createGroupRoom(@RequestBody ChatRoomCreateDto chatRoomCreateDto,
+                                             @AuthenticationPrincipal CustomUserPrincipal principal) {
         log.info("/room/group/create 요청");
         chatService.createGroupRoom(chatRoomCreateDto, principal.getName());
         return ResponseEntity.ok().build();
@@ -38,11 +39,11 @@ public class ChatController {
     }
 
     // 그룹채팅방 참여 API
-    @PostMapping("/room/group/{roomId}/join")
-    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long roomId,
+    @PostMapping("/room/group/{postId}/join")
+    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long postId,
                                                @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/join 요청");
-        chatService.addParticipantToGroupChat(roomId, customUserPrincipal.getName());
+        chatService.addParticipantToGroupChat(postId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -69,7 +70,7 @@ public class ChatController {
     public ResponseEntity<?> leaveGroupChatRoom(@PathVariable Long roomId,
                                                 @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/leave 요청");
-        chatService.leaveChatRoom(roomId);
+        chatService.leaveChatRoom(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -78,7 +79,7 @@ public class ChatController {
     public ResponseEntity<?> chatRoomMembers(@PathVariable Long roomId,
                                              @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/api/chat/member/list 요청");
-        chatService.leaveChatRoom(roomId);
+        chatService.leaveChatRoom(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
