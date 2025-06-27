@@ -79,7 +79,7 @@ public class AuthController {
         // 인증 객체 있으면 유저인포 만들어서 리턴
         if (userDetails != null) {
             UserInfoDto userInfo = new UserInfoDto(
-                    userDetails.getUsername(),
+                    userDetails.getName(),
                     userDetails.getAuthorities().iterator().next().getAuthority()
             );
             return ResponseEntity.ok(new AuthStatusDto(true, userInfo));

@@ -39,11 +39,11 @@ public class ChatController {
     }
 
     // 그룹채팅방 참여 API
-    @PostMapping("/room/group/{roomId}/join")
-    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long roomId,
+    @PostMapping("/room/group/{postId}/join")
+    public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long postId,
                                                @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/join 요청");
-        chatService.addParticipantToGroupChat(roomId, customUserPrincipal.getName());
+        chatService.addParticipantToGroupChat(postId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
