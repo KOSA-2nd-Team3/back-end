@@ -151,14 +151,13 @@ public class PostService {
         partyMemberRepository.save(partyMember);
     }
 
-    public Page<MyPostResponseDto> readMyPost(String loginId, int page) {
+    public Page<MyPostResponseDto> readMyPost(String loginId, int page, String sortField, String sortDirection) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-
-        //몇 페이지, 몇 개, 정렬(기본은 최신순)
-        PageRequest pageRequest = PageRequest.of(page, 9, Sort.by("createdAt").descending());
-        Page<Post> posts = postRepository.findPostsByMemberId(member.getId(), pageRequest);
+        Sort sort = getSort(sortField, sortDirection);
+        Pageable pageable = PageRequest.of(page, 9, sort);
+        Page<Post> posts = postRepository.findPostsByMemberId(member.getId(), pageable);
 
         return posts.map(post -> {
                 String isOwner = post.getPartyMember()
@@ -254,10 +253,6 @@ public class PostService {
                 .build()).toList();
     }
 
-    public int getActiveCount(String loginId) {
-        return postRepository.activeCount(loginId);
-    }
-
     public PlatformPostNullResponseDto platformPostNull(Long platformId) {
         Platform platform = platformRepository.findById(platformId)
                 .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
@@ -268,12 +263,9 @@ public class PostService {
                 .build();
     }
 
-    public int getExpiredCount(String loginId) {
-        return postRepository.expiredCount(loginId);
-    }
-
-    public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page) {
-        Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+    public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page, String sortField, String sortDirection) {
+        Sort sort = getSort(sortField, sortDirection);
+        Pageable pageable = PageRequest.of(page, 9, sort);
         Page<Post> posts = postRepository.findAllByPartyMemberLoginId(loginId, pageable);
 
         return posts.map(post -> {
@@ -294,5 +286,21 @@ public class PostService {
                     .isExpired(post.getIsExpired())
                     .build();
         });
+    }
+
+    // 정렬 조건 생성 헬퍼 메서드
+    private Sort getSort(String sortField, String sortDirection) {
+        Sort.Direction direction = Sort.Direction.fromOptionalString(sortDirection.toUpperCase()).orElse(Sort.Direction.DESC);
+
+        // 안전하게 필드 매핑 (Platform.name은 join이 필요하므로 alias 'platform.name' 으로 정렬 가능하게 쿼리 수정 필요)
+        if ("platformName".equalsIgnoreCase(sortField)) {
+            // platform.name 으로 정렬 (Post 엔티티에 platform.name 조인 후 정렬 가능)
+            return Sort.by(direction, "platform.name");
+        } else if ("createdAt".equalsIgnoreCase(sortField)) {
+            return Sort.by(direction, "createdAt");
+        } else {
+            // 기본값
+            return Sort.by(direction, "createdAt");
+        }
     }
 }

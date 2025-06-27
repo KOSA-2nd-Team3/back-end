@@ -51,9 +51,12 @@ public class PostController {
 
     // 내 페이지에서 내가 참여한 방 확인
     @GetMapping("/myPost")
-    public ResponseEntity<Page<MyPostResponseDto>> myPost(@AuthenticationPrincipal CustomUserPrincipal principal,
-                                                          @RequestParam(defaultValue = "0") int page) {
-        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(principal.getName(), page);
+    public ResponseEntity<Page<MyPostResponseDto>> myPost(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "createdAt") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(principal.getName(), page, sortField, sortDirection);
         return new ResponseEntity<>(myPostResponses, HttpStatus.OK);
     }
 
@@ -91,29 +94,15 @@ public class PostController {
         return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
     }
 
-    // 나의 모집중인 구인글 개수
-    @GetMapping("/myPost/active")
-    public ResponseEntity<?> myPostActive(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        String loginId = principal.getName();
-        int activeCount = postService.getActiveCount(loginId);
-        return new ResponseEntity<>(activeCount, HttpStatus.OK);
-    }
-
-    //나의 만료된 구인글 개수
-    @GetMapping("/myPost/expired")
-    public ResponseEntity<?> myPostExpired(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        String loginId = principal.getName();
-        int expiredCount = postService.getExpiredCount(loginId);
-        return new ResponseEntity<>(expiredCount, HttpStatus.OK);
-    }
-    //
     // 내가 partyMember로 참여한 모든 Post 조회
     @GetMapping("/myPost-join")
     public ResponseEntity<Page<MyPostResponseDto>> getMyPartyPosts(
             @AuthenticationPrincipal CustomUserPrincipal principal,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "createdAt") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         String loginId = principal.getName();
-        Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(loginId, page);
+        Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(loginId, page, sortField, sortDirection);
         return ResponseEntity.ok(result);
     }
 }
