@@ -13,17 +13,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p FROM Post p JOIN FETCH p.chatRoom cr WHERE p.member.id = :memberId", countQuery = "SELECT count (p) FROM Post p")
     Page<Post> findPostsByMemberId(Long memberId, Pageable pageable);
 
-    @Query("SELECT count(p) FROM Post p WHERE p.member.loginId = :loginId AND p.isExpired = 'N'")
-    int activeCount(String loginId);
-
     //PlatForm, Member 사용
     Page<Post> findPostByPlatformName(String platformName, Pageable pageable);
 
     List<Post> findByPlatformId(Long platformId);
-
-    @Query("SELECT count(p) FROM Post p WHERE p.member.loginId = :loginId AND p.isExpired = 'Y'")
-    int expiredCount(String loginId);
-
+    
     @Query(value = "SELECT DISTINCT p FROM Post p " +
             "JOIN p.partyMember pm " +
             "JOIN pm.member m " +

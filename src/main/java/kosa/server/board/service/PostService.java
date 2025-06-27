@@ -254,10 +254,6 @@ public class PostService {
                 .build()).toList();
     }
 
-    public int getActiveCount(String loginId) {
-        return postRepository.activeCount(loginId);
-    }
-
     public PlatformPostNullResponseDto platformPostNull(Long platformId) {
         Platform platform = platformRepository.findById(platformId)
                 .orElseThrow(()->new IllegalArgumentException("로그인 아이디 정보가 없습니다."));
@@ -266,10 +262,6 @@ public class PostService {
                 .platformName(platform.getName())
                 .platformPrice(platform.getPrice())
                 .build();
-    }
-
-    public int getExpiredCount(String loginId) {
-        return postRepository.expiredCount(loginId);
     }
 
     public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page) {
