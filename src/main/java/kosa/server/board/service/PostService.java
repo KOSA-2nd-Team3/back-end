@@ -81,9 +81,6 @@ public class PostService {
             editor.hostId(request.getHostId());
         }
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
-        if (request.getCapacity() != 0) {
-            editor.capacity(request.getCapacity());
-        }
         if (request.getDurationMonth() != 0) {
             editor.durationMonth(request.getDurationMonth());
         }
@@ -234,6 +231,8 @@ public class PostService {
                 .isExpired(posts.getIsExpired())
                 .members(members)
                 .platformImageUrl(posts.getPlatform().getImageUrl())
+                .limitCount(posts.getPlatform().getLimitCount())
+                .expirationDate(posts.getExpirationDate())
                 .build();
     }
 
