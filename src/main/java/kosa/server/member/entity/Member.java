@@ -57,7 +57,7 @@ public class Member extends BaseEntity {
         this.name = name;
         this.email = email;
         this.role = role;
-        this.enabled = false;
+        this.enabled = enabled;
     }
 
     public void addRefreshToken(RefreshToken refreshToken) {
