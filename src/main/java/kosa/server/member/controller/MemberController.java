@@ -20,8 +20,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/profile")
-    public ResponseEntity<ProfileResponseDto> getProfile(@AuthenticationPrincipal CustomUserPrincipal customUserDetails) {
-        String loginId = customUserDetails.getUsername();
+    public ResponseEntity<ProfileResponseDto> getProfile(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
+        String loginId = customUserPrincipal.getName();
         ProfileResponseDto profileResponseDto = memberService.getProfile(loginId);
         return ResponseEntity.ok(profileResponseDto);
     }
