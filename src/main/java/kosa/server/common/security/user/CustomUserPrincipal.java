@@ -38,6 +38,7 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     //공통
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (member == null) return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
         return Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getRoleName()));
     }
 

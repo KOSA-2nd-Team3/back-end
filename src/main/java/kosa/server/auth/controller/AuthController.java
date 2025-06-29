@@ -9,8 +9,10 @@ import kosa.server.auth.dto.AuthStatusDto;
 import kosa.server.auth.dto.JoinRequestDto;
 import kosa.server.auth.dto.LoginRequestDto;
 import kosa.server.auth.dto.UserInfoDto;
+import kosa.server.auth.oauth2.handler.TempAuthStorage;
 import kosa.server.auth.service.AuthService;
 import kosa.server.common.code.ErrorCode;
+import kosa.server.common.security.jwt.JwtProvider;
 import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
 import kosa.server.member.exception.TokenNotFoundException;
@@ -31,6 +33,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final CookieUtil cookieUtil;
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
     public ResponseEntity<AuthStatusDto> loginMember(@RequestBody @Valid LoginRequestDto loginRequestDto, HttpServletResponse response) {
@@ -46,6 +49,36 @@ public class AuthController {
 
         AuthStatusDto authStatusDto = new AuthStatusDto(true, userInfo);
         return new ResponseEntity<>(authStatusDto, HttpStatus.OK);
+    }
+
+    // **새로 추가된 소셜 로그인 토큰 교환 엔드포인트**
+    @PostMapping("/social/exchange")
+    public ResponseEntity<AuthStatusDto> exchangeSocialToken(@RequestBody Map<String, String> request, HttpServletResponse response) {
+        String tempCode = request.get("code");
+
+        if (tempCode == null || tempCode.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 임시 코드로 액세스 토큰 조회
+        String accessToken = TempAuthStorage.retrieveAndRemove(tempCode);
+
+        if (accessToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 토큰으로부터 사용자 정보 추출 (JWT 디코딩)
+        String loginId = jwtProvider.getLoginId(accessToken);
+        String role = jwtProvider.getRole(accessToken);
+
+        // 응답 헤더에 액세스 토큰 설정
+        response.addHeader("Authorization", "Bearer " + accessToken);
+
+        // 사용자 정보 생성
+        UserInfoDto userInfo = new UserInfoDto(loginId, role);
+        AuthStatusDto authStatusDto = new AuthStatusDto(true, userInfo);
+
+        return ResponseEntity.ok(authStatusDto);
     }
 
     @PostMapping("/join")
