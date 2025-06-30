@@ -10,7 +10,7 @@ import lombok.Data;
 public class PostUpdateRequestDto {
 
     private Long postId;
-    private int capacity;
+    private int limitCount;
     private int durationMonth;
 
     @JsonProperty("email")
@@ -19,8 +19,8 @@ public class PostUpdateRequestDto {
     private String hostPwd;
 
     @Builder
-    public PostUpdateRequestDto(int capacity, int durationMonth, String hostId, String hostPwd) {
-        this.capacity = capacity;
+    public PostUpdateRequestDto(int limitCount, int durationMonth, String hostId, String hostPwd) {
+        this.limitCount = limitCount;
         this.durationMonth = durationMonth;
         this.hostId = hostId;
         this.hostPwd = hostPwd;

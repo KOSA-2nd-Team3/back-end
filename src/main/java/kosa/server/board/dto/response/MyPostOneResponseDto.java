@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,7 +14,7 @@ public class MyPostOneResponseDto {
     // platform
     private String platformName;
     private BigDecimal price;
-
+    private int limitCount;
     // Post
     private Long postId;
     private int currentCount;
@@ -23,6 +24,8 @@ public class MyPostOneResponseDto {
     private String hostPwd;
     private String isExpired;
     private List<PartyMemberDto> members;
+    private LocalDateTime expirationDate;
+    private LocalDateTime startDate;
 
     //partyMember
     private Long memberId;

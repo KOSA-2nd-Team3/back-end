@@ -27,6 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "AND pm.isOwner = 'N'")
     Page<Post> findAllByPartyMemberLoginId(String loginId, Pageable pageable);
 
+    List<Post> findAllByIsExpired(String isExpired);
     //PlatForm, Member 사용
     Page<Post> findPostByPlatformName(String platformName, Pageable pageable);
 

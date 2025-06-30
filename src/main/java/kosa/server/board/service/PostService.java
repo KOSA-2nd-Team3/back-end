@@ -1,5 +1,6 @@
 package kosa.server.board.service;
 
+import jakarta.mail.MessagingException;
 import kosa.server.board.dto.request.PostCreateRequestDto;
 import kosa.server.board.dto.request.PostUpdateRequestDto;
 import kosa.server.board.dto.response.*;
@@ -10,6 +11,7 @@ import kosa.server.board.repository.PartyMemberRepository;
 import kosa.server.board.repository.PlatformRepository;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.common.code.ErrorCode;
+import kosa.server.mail.service.MailService;
 import kosa.server.member.entity.Member;
 import kosa.server.member.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
@@ -18,7 +20,9 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,7 @@ public class PostService {
     private final PlatformRepository platformRepository;
     private final PartyMemberRepository partyMemberRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final MailService mailService;
 
     public Long create(PostCreateRequestDto request) {
         //dto를 post로 변환
@@ -81,20 +86,11 @@ public class PostService {
             editor.hostId(request.getHostId());
         }
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
-        if (request.getCapacity() != 0) {
-            editor.capacity(request.getCapacity());
-        }
-        if (request.getDurationMonth() != 0) {
+        if (request.getDurationMonth() != 0 && request.getDurationMonth() != postToUpdate.getDurationMonth()) {
             editor.durationMonth(request.getDurationMonth());
+            editor.limitCount(postToUpdate.getLimitCount() - 1);
         }
         postToUpdate.edit(editor.build());
-    }
-
-    // 파티장일때
-    public void delete(Long id) {
-        Post postToDelete = postRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("글을 찾을 수 없습니다."));
-        postRepository.delete(postToDelete);
     }
 
     // 파티원일때
@@ -151,6 +147,20 @@ public class PostService {
         partyMemberRepository.save(partyMember);
     }
 
+    // 동기 메서드: 데이터 준비
+    public void prepareAndSendMail(Long postId) throws UnsupportedEncodingException, MessagingException {
+        List<PartyMember> members = partyMemberRepository.findByPostId(postId);
+        List<MailTargetResponseDto> targets = members.stream()
+                .map(m -> new MailTargetResponseDto(
+                        m.getMember().getEmail(),
+                        m.getPost().getPlatform().getName(),
+                        "http://localhost:8080/post/" + postId,
+                        m.getPost().getPartySize()
+                ))
+                .toList();
+        mailService.sendMail(targets); // 비동기 메서드 호출
+    }
+
     public Page<MyPostResponseDto> readMyPost(String loginId, int page, String sortField, String sortDirection) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("회원을 찾을 수 없습니다."));
@@ -171,10 +181,12 @@ public class PostService {
                 .postId(post.getId())
                 .platformName(post.getPlatform().getName())
                 .currentCount(post.getCurrentCount())
+                .platformImageUrl(post.getPlatform().getImageUrl())
                 .partySize(post.getPartySize())
                 .price(post.getPlatform().getPrice().divide(BigDecimal.valueOf(post.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
                 .isOwner(isOwner)
                 .isExpired(post.getIsExpired())
+                .createdAt(post.getCreatedAt())
                 .build();
         });
     }
@@ -234,6 +246,9 @@ public class PostService {
                 .isExpired(posts.getIsExpired())
                 .members(members)
                 .platformImageUrl(posts.getPlatform().getImageUrl())
+                .limitCount(posts.getLimitCount())
+                .expirationDate(posts.getExpirationDate())
+                .startDate(posts.getStartDate())
                 .build();
     }
 
@@ -302,5 +317,27 @@ public class PostService {
             // 기본값
             return Sort.by(direction, "createdAt");
         }
+    }
+
+    //만료 상태 업데이트
+    @Transactional
+    public void updateExpiredPosts() {
+        LocalDateTime today = LocalDateTime.now();
+        List<Post> posts = postRepository.findAllByIsExpired("N");
+        for (Post post : posts) {
+            if (post.getExpirationDate() != null && !post.getExpirationDate().isAfter(today)) {
+                post.expired();
+            }
+        }
+        postRepository.saveAll(posts);
+    }
+
+    @Transactional
+    public void startService(Long postId, int durationMonth) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()->new IllegalArgumentException("구독 정보가 없습니다."));
+
+        post.startService(durationMonth);
+        postRepository.save(post);
     }
 }

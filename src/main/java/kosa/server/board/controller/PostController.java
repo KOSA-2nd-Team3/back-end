@@ -1,11 +1,9 @@
 package kosa.server.board.controller;
 
-import kosa.server.board.dto.request.LeaveMyPostRequestDto;
-import kosa.server.board.dto.request.PartyJoinRequestDto;
+import jakarta.mail.MessagingException;
+import kosa.server.board.dto.request.*;
 import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
-import kosa.server.board.dto.request.PostCreateRequestDto;
-import kosa.server.board.dto.request.PostUpdateRequestDto;
 import kosa.server.board.dto.response.PlatformPostNullResponseDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
@@ -18,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,6 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final MemberService memberService;
 
     // 방 생성
     @PostMapping("/subscription/create")
@@ -39,13 +37,6 @@ public class PostController {
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody PostUpdateRequestDto request) {
         postService.update(request);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // 방 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        postService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -74,6 +65,12 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/mailSend/{postId}")
+    public ResponseEntity<?> sendMail(@PathVariable Long postId)
+            throws MessagingException, UnsupportedEncodingException {
+        postService.prepareAndSendMail(postId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     // 파티원일때, 파티방 삭제
     @PostMapping("/leaveMyPost")
     public ResponseEntity<?> leaveMyPost(@RequestBody LeaveMyPostRequestDto request) {
@@ -104,5 +101,11 @@ public class PostController {
         String loginId = principal.getName();
         Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(loginId, page, sortField, sortDirection);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<?> startService(@RequestBody StartRequestDto dto){
+        postService.startService(dto.getPostId(), dto.getDurationMonth());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

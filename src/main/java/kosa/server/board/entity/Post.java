@@ -7,6 +7,7 @@ import kosa.server.common.BaseEntity;
 import kosa.server.member.entity.Member;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,15 @@ public class Post extends BaseEntity {
     @Column(name = "is_expired", nullable = false)
     private String isExpired;
 
+    @Column(name = "expiration_date")
+    private LocalDateTime expirationDate;
+
+    @Column(name = "limit_count")
+    private int limitCount = 2;
+
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
     public void addPartyMember(PartyMember partyMember) {
         this.partyMember.add(partyMember);
     }
@@ -72,17 +82,25 @@ public class Post extends BaseEntity {
 
     public PostUpdateRequestDto.PostUpdateRequestDtoBuilder toEditor() {
         return PostUpdateRequestDto.builder()
-                .capacity(this.partySize)
+                .limitCount(this.limitCount)
                 .durationMonth(this.durationMonth)
                 .hostId(this.hostId)
                 .hostPwd(this.hostPwd);
     }
 
     public void edit(PostUpdateRequestDto dto) {
-        this.partySize = dto.getCapacity();
+        this.limitCount = dto.getLimitCount();
         this.durationMonth = dto.getDurationMonth();
         this.hostId = dto.getHostId();
         this.hostPwd = dto.getHostPwd();
     }
 
+    public void expired() {
+        this.isExpired = "Y";
+    }
+
+    public void startService(int durationMonth){
+        this.startDate = LocalDateTime.now();
+        this.expirationDate = LocalDateTime.now().plusMonths(durationMonth);
+    }
 }
