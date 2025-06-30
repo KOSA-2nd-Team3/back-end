@@ -108,7 +108,7 @@ public class ChatService {
             ChatRoomListResDto dto = ChatRoomListResDto.builder()
                     .leaderId(c.getPost().getMember().getLoginId())
                     .roomId(c.getId())
-                    .roomName(c.getName())
+                    .roomName(c.getPost().getPlatform().getName() + " #" + c.getPost().getId())
                     .serviceName(c.getPost().getPlatform().getName())
                     .unreadCount(count)
                     .createdAt(c.getCreatedAt())
