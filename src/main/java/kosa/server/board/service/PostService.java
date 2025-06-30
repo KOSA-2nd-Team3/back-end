@@ -299,6 +299,7 @@ public class PostService {
                     .price(post.getPlatform().getPrice().divide(BigDecimal.valueOf(post.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
                     .isOwner(isOwner)
                     .isExpired(post.getIsExpired())
+                    .platformImageUrl(post.getPlatform().getImageUrl())
                     .build();
         });
     }
