@@ -27,6 +27,8 @@ public class PlatformPostResponseDto {
     private int partySize;
     @Schema(description = "만료 여부", example = "N", required = true)
     private String isExpired;
+    @Schema(description = "구독 개월 수", example = "1", type = "int" required = true)
+    private int durationMonth;
     @Schema(description = "게시글 시작일", example = "2025-06-01T00:00:00", type = "string", format = "date-time", required = true)
     private LocalDateTime startDate;
     @Schema(description = "게시글 생성일", example = "2025-06-01T00:00:00", type = "string", format = "date-time", required = true)
