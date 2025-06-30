@@ -49,6 +49,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .nickname(customUserPrincipal.getNickname())
                     .name(customUserPrincipal.getUsername())
                     .email(customUserPrincipal.getEmail())
+                    .enabled(true)
                     .role(role)
                     .build();
             memberJpaRepository.save(member);

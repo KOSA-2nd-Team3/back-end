@@ -1,18 +1,16 @@
 package kosa.server.common.config;
 
 import kosa.server.auth.oauth2.handler.LoginSuccessHandler;
+import kosa.server.auth.oauth2.service.CustomOAuth2UserService;
 import kosa.server.common.security.filter.JwtAuthenticationFilter;
 import kosa.server.common.security.handler.CustomAuthenticationEntryPoint;
-import kosa.server.auth.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -62,7 +60,7 @@ public class SecurityConfig {
         // 인증 엔드포인트 설정
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue","/oauth2/**", "/api/auth/login/verify", "/api/auth/send-verification-email", "/connect", "/connect/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/join", "/api/auth/token/reissue", "/api/auth/social/exchange","/oauth2/**", "/api/auth/login/verify", "/api/auth/send-verification-email", "/connect", "/connect/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/post/**").permitAll()
                         .requestMatchers("/list/**").permitAll()
