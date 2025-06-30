@@ -16,6 +16,7 @@ public class PlatformPostResponseDto {
     private int currentCount;
     private int partySize;
     private String isExpired;
+    private LocalDateTime startDate;
     private LocalDateTime createdAt;
 
 }

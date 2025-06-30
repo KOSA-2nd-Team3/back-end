@@ -235,7 +235,7 @@ public class PostService {
         return MyPostOneResponseDto.builder()
                 .postId(posts.getId())
                 .platformName(posts.getPlatform().getName())
-                .price(posts.getPlatform().getPrice())
+                .price(posts.getPlatform().getPrice().divide(BigDecimal.valueOf(posts.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
                 .currentCount(posts.getCurrentCount())
                 .partySize(posts.getPartySize())
                 .durationMonth(posts.getDurationMonth())
@@ -264,6 +264,7 @@ public class PostService {
                 .currentCount(post.getCurrentCount())
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
+                .startDate(post.getStartDate())
                 .createdAt(post.getCreatedAt())
                 .build()).toList();
     }
