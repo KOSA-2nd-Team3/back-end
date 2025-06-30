@@ -262,6 +262,7 @@ public class PostService {
                 .monthUnit(post.getPlatform().getMonthUnit())
                 .currentCount(post.getCurrentCount())
                 .partySize(post.getPartySize())
+                .durationMonth(post.getDurationMonth())
                 .isExpired(post.getIsExpired())
                 .startDate(post.getStartDate())
                 .createdAt(post.getCreatedAt())
