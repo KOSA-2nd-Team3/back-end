@@ -161,36 +161,40 @@ public class PostService {
         mailService.sendMail(targets); // 비동기 메서드 호출
     }
 
-    public Page<MyPostResponseDto> readMyPost(String loginId, int page, String sortField, String sortDirection) {
+    // 파티장 조회 - 상태 필터 포함
+    public Page<MyPostResponseDto> readMyPost(String loginId, int page, String sortField, String sortDirection, String statusFilter) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(()->new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         Sort sort = getSort(sortField, sortDirection);
         Pageable pageable = PageRequest.of(page, 9, sort);
-        Page<Post> posts = postRepository.findPostsByMemberId(member.getId(), pageable);
+
+        // 상태 필터에 따른 isExpired 값 결정
+        String isExpired = "active".equals(statusFilter) ? "N" : "Y";
+
+        Page<Post> posts = postRepository.findPostsByMemberIdAndExpiredStatus(member.getId(), isExpired, pageable);
 
         return posts.map(post -> {
-                String isOwner = post.getPartyMember()
-                .stream()
-                .filter(pm -> pm.getMember().getId().equals(member.getId()))
-                .findFirst()
-                .map(PartyMember::getIsOwner)
-                .orElse("N");
+            String isOwner = post.getPartyMember()
+                    .stream()
+                    .filter(pm -> pm.getMember().getId().equals(member.getId()))
+                    .findFirst()
+                    .map(PartyMember::getIsOwner)
+                    .orElse("N");
 
-                return MyPostResponseDto.builder()
-                .postId(post.getId())
-                .platformName(post.getPlatform().getName())
-                .currentCount(post.getCurrentCount())
-                .platformImageUrl(post.getPlatform().getImageUrl())
-                .partySize(post.getPartySize())
-                .price(post.getPlatform().getPrice().divide(BigDecimal.valueOf(post.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
-                .isOwner(isOwner)
-                .isExpired(post.getIsExpired())
-                .createdAt(post.getCreatedAt())
-                .build();
+            return MyPostResponseDto.builder()
+                    .postId(post.getId())
+                    .platformName(post.getPlatform().getName())
+                    .currentCount(post.getCurrentCount())
+                    .platformImageUrl(post.getPlatform().getImageUrl())
+                    .partySize(post.getPartySize())
+                    .price(post.getPlatform().getPrice().divide(BigDecimal.valueOf(post.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
+                    .isOwner(isOwner)
+                    .isExpired(post.getIsExpired())
+                    .createdAt(post.getCreatedAt())
+                    .build();
         });
     }
-
 
     public Slice<PlatformPostResponseDto> findByPlatformName(String platformName) {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending());
@@ -204,7 +208,6 @@ public class PostService {
                 .isExpired(post.getIsExpired())
                 .build());
     }
-
 
     public MyPostOneResponseDto selectParty(String loginId, Long postId) {
         // postId 검증
@@ -235,7 +238,7 @@ public class PostService {
         return MyPostOneResponseDto.builder()
                 .postId(posts.getId())
                 .platformName(posts.getPlatform().getName())
-                .price(posts.getPlatform().getPrice().divide(BigDecimal.valueOf(posts.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
+                .price(posts.getPlatform().getPrice())
                 .currentCount(posts.getCurrentCount())
                 .partySize(posts.getPartySize())
                 .durationMonth(posts.getDurationMonth())
@@ -264,7 +267,6 @@ public class PostService {
                 .currentCount(post.getCurrentCount())
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
-                .startDate(post.getStartDate())
                 .createdAt(post.getCreatedAt())
                 .build()).toList();
     }
@@ -279,10 +281,15 @@ public class PostService {
                 .build();
     }
 
-    public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page, String sortField, String sortDirection) {
+    // 파티원 조회 - 상태 필터 포함
+    public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page, String sortField, String sortDirection, String statusFilter) {
         Sort sort = getSort(sortField, sortDirection);
         Pageable pageable = PageRequest.of(page, 9, sort);
-        Page<Post> posts = postRepository.findAllByPartyMemberLoginId(loginId, pageable);
+
+        // 상태 필터에 따른 isExpired 값 결정
+        String isExpired = "active".equals(statusFilter) ? "N" : "Y";
+
+        Page<Post> posts = postRepository.findAllByPartyMemberLoginIdAndExpiredStatus(loginId, isExpired, pageable);
 
         return posts.map(post -> {
             // isOwner 여부 확인
@@ -301,11 +308,12 @@ public class PostService {
                     .isOwner(isOwner)
                     .isExpired(post.getIsExpired())
                     .platformImageUrl(post.getPlatform().getImageUrl())
+                    .createdAt(post.getCreatedAt())
                     .build();
         });
     }
 
-    // 정렬 조건 생성 헬퍼 메서드
+    // 정렬 조건 생성 헬퍼 메서드 - 더 많은 정렬 옵션 지원
     private Sort getSort(String sortField, String sortDirection) {
         Sort.Direction direction = Sort.Direction.fromOptionalString(sortDirection.toUpperCase()).orElse(Sort.Direction.DESC);
 
