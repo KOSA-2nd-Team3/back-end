@@ -151,7 +151,7 @@ public class PostService {
                 .map(m -> new MailTargetResponseDto(
                         m.getMember().getEmail(),
                         m.getPost().getPlatform().getName(),
-                        "http://localhost:8080/post/" + postId,
+                        "http://localhost:5173/dashboard/" + postId,
                         m.getPost().getPartySize()
                 ))
                 .toList();
