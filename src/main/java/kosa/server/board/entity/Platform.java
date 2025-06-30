@@ -37,7 +37,4 @@ public class Platform {
 
     @OneToMany(mappedBy = "platform")
     private List<Post> post = new ArrayList<>();
-
-    @Column(name = "limit_count")
-    private int limitCount = 2;
 }

@@ -33,20 +33,6 @@ public class MailService {
     private String fixedServiceSenderEmail;
     private final SpringTemplateEngine templateEngine;
 
-    // 동기 메서드: 데이터 준비
-    public void prepareAndSendMail(Long postId) throws UnsupportedEncodingException, MessagingException {
-        List<PartyMember> members = partyMemberRepository.findByPostId(postId);
-        List<MailTargetResponseDto> targets = members.stream()
-                .map(m -> new MailTargetResponseDto(
-                        m.getMember().getEmail(),
-                        m.getPost().getPlatform().getName(),
-                        "http://localhost:8080/post/" + postId,
-                        m.getPost().getPartySize()
-                ))
-                .toList();
-        sendMail(targets); // 비동기 메서드 호출
-    }
-
     //구인글 모집이 완료되었을 때 사용할 메서드
     @Async
     public void sendMail(List<MailTargetResponseDto> targets)

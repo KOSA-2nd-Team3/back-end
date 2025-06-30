@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,4 +18,6 @@ public class MyPostResponseDto {
     private BigDecimal price;
     private String isOwner;
     private String isExpired;
+    private String platformImageUrl;
+    private LocalDateTime createdAt;
 }

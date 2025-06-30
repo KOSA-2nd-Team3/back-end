@@ -25,6 +25,7 @@ public class MyPostOneResponseDto {
     private String isExpired;
     private List<PartyMemberDto> members;
     private LocalDateTime expirationDate;
+    private LocalDateTime startDate;
 
     //partyMember
     private Long memberId;
