@@ -88,7 +88,6 @@ public class PostService {
         // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
         if (request.getDurationMonth() != 0 && request.getDurationMonth() != postToUpdate.getDurationMonth()) {
             editor.durationMonth(request.getDurationMonth());
-            editor.limitCount(postToUpdate.getLimitCount() - 1);
         }
         postToUpdate.edit(editor.build());
     }
@@ -236,7 +235,7 @@ public class PostService {
         return MyPostOneResponseDto.builder()
                 .postId(posts.getId())
                 .platformName(posts.getPlatform().getName())
-                .price(posts.getPlatform().getPrice())
+                .price(posts.getPlatform().getPrice().divide(BigDecimal.valueOf(posts.getPartySize()), 0, BigDecimal.ROUND_HALF_UP))
                 .currentCount(posts.getCurrentCount())
                 .partySize(posts.getPartySize())
                 .durationMonth(posts.getDurationMonth())
@@ -247,7 +246,6 @@ public class PostService {
                 .isExpired(posts.getIsExpired())
                 .members(members)
                 .platformImageUrl(posts.getPlatform().getImageUrl())
-                .limitCount(posts.getLimitCount())
                 .expirationDate(posts.getExpirationDate())
                 .startDate(posts.getStartDate())
                 .build();
@@ -265,6 +263,7 @@ public class PostService {
                 .currentCount(post.getCurrentCount())
                 .partySize(post.getPartySize())
                 .isExpired(post.getIsExpired())
+                .startDate(post.getStartDate())
                 .createdAt(post.getCreatedAt())
                 .build()).toList();
     }
