@@ -58,9 +58,6 @@ public class Post extends BaseEntity {
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
-    @Column(name = "limit_count")
-    private int limitCount = 2;
-
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
@@ -82,14 +79,12 @@ public class Post extends BaseEntity {
 
     public PostUpdateRequestDto.PostUpdateRequestDtoBuilder toEditor() {
         return PostUpdateRequestDto.builder()
-                .limitCount(this.limitCount)
                 .durationMonth(this.durationMonth)
                 .hostId(this.hostId)
                 .hostPwd(this.hostPwd);
     }
 
     public void edit(PostUpdateRequestDto dto) {
-        this.limitCount = dto.getLimitCount();
         this.durationMonth = dto.getDurationMonth();
         this.hostId = dto.getHostId();
         this.hostPwd = dto.getHostPwd();
