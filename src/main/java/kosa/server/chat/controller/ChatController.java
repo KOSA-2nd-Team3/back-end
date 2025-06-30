@@ -1,5 +1,7 @@
 package kosa.server.chat.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kosa.server.chat.dto.*;
 import kosa.server.chat.service.ChatService;
 import kosa.server.common.security.user.CustomUserPrincipal;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Chat API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -20,6 +23,7 @@ public class ChatController {
     private final ChatService chatService;
 
     // 그룹 채팅방 개설
+    @Operation(summary = "그룹 채팅방 생성", description = "새로운 그룹 채팅방을 생성합니다.")
     @PostMapping("/room/group/create")
     public ResponseEntity<?> createGroupRoom(@RequestBody ChatRoomCreateDto chatRoomCreateDto,
                                              @AuthenticationPrincipal CustomUserPrincipal principal) {
@@ -30,6 +34,7 @@ public class ChatController {
 
     // 그룹채팅 목록 조회
 //    @GetMapping("/room/group/list")
+    @Operation(summary = "내 그룹 채팅방 목록 조회", description = "현재 로그인한 사용자가 참여 중인 그룹 채팅방 목록을 조회합니다.")
     @GetMapping("/api/chat/rooms")
     public ResponseEntity<?> getGroupChatRooms(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/api/chat/rooms 요청");
@@ -39,6 +44,7 @@ public class ChatController {
     }
 
     // 그룹채팅방 참여 API
+    @Operation(summary = "그룹 채팅방 참여", description = "해당 postId의 그룹 채팅방에 참가합니다.")
     @PostMapping("/room/group/{postId}/join")
     public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long postId,
                                                @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
@@ -48,6 +54,7 @@ public class ChatController {
     }
 
     // 이전 메시지 조회
+    @Operation(summary = "채팅방 이전 메시지 조회", description = "지정된 채팅방 ID에 대한 메시지 히스토리를 조회합니다.")
     @GetMapping("/api/chat/history/{roomId}")
     public ResponseEntity<?> getChatHistory(@PathVariable Long roomId,
                                             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
@@ -57,6 +64,7 @@ public class ChatController {
     }
 
     // 채팅 메시지 읽음 처리
+    @Operation(summary = "채팅 메시지 읽음 처리", description = "지정된 채팅방의 메시지를 읽음 처리합니다.")
     @PostMapping("/room/{roomId}/read")
     public ResponseEntity<?> messageRead(@PathVariable Long roomId,
                                          @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
@@ -66,6 +74,7 @@ public class ChatController {
     }
 
     // 채팅방 나가기
+    @Operation(summary = "채팅방 나가기", description = "지정된 채팅방에서 나갑니다.")
     @DeleteMapping("/room/group/{roomId}/leave")
     public ResponseEntity<?> leaveGroupChatRoom(@PathVariable Long roomId,
                                                 @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
@@ -83,6 +92,7 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "채팅방 참여자 목록 조회", description = "지정된 채팅방의 참여자 목록을 조회합니다.")
     @GetMapping("/api/chat/room/{roomId}/members")
     public ResponseEntity<?> chatRoomMemberList(@PathVariable Long roomId) {
         log.info("/api/chat/member/list 요청");
@@ -91,6 +101,7 @@ public class ChatController {
     }
 
     //    /api/chat/room-by-post/{postId}
+    @Operation(summary = "postId 기준 채팅방 ID 조회", description = "postId로 연결된 채팅방 ID를 조회합니다.")
     @GetMapping("/api/chat/room-by-post/{postId}")
     public ResponseEntity<?> chatRoomByPostId(@PathVariable Long postId,
                                               @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {

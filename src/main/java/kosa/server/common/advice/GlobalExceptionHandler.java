@@ -1,5 +1,6 @@
 package kosa.server.common.advice;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.common.dto.ErrorResponseDto;
@@ -83,6 +84,17 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ex.getErrorCode();  // 예외에서 직접 errorCode 꺼내기
 
         log.warn("이메일 인증이 완료되지 않은 사용자 접근: {}", ex.getMessage());
+
+        ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
+        return new ResponseEntity<>(response, errorCode.getStatus());
+    }
+
+    public ResponseEntity<ErrorResponseDto> handleInvalidArgument(
+            InvalidArgumentException ex, HttpServletRequest request) {
+
+        ErrorCode errorCode = ex.getErrorCode();
+
+        log.warn("[InvalidArgumentException]: {}", ex.getMessage(), ex);
 
         ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
         return new ResponseEntity<>(response, errorCode.getStatus());

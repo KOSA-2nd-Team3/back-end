@@ -13,6 +13,7 @@ import kosa.server.board.repository.PostRepository;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.mail.service.MailService;
 import kosa.server.member.entity.Member;
+import kosa.server.member.exception.InvalidArgumentException;
 import kosa.server.member.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,7 @@ public class PostService {
 
         // todo 예외 만들기
         Post postToUpdate = postRepository.findById(request.getPostId())
-                .orElseThrow(()->new IllegalArgumentException("글을 찾을 수 없습니다."));
+                .orElseThrow(()-> new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
 
         PostUpdateRequestDto.PostUpdateRequestDtoBuilder editor = postToUpdate.toEditor();
         if (request.getHostPwd() != null) {
@@ -129,7 +130,7 @@ public class PostService {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
         Post post = postRepository.findById(postId)
-                .orElseThrow(()->new IllegalArgumentException("방이 존재하지 않습니다."));
+                .orElseThrow(()->new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
 
         PartyMember partyMember = PartyMember.builder()
                 .post(post)
@@ -140,7 +141,7 @@ public class PostService {
         boolean alreadyJoined = post.getPartyMember().stream()
                 .anyMatch(pm -> pm.getMember().equals(member));
         if (alreadyJoined) {
-            throw new IllegalArgumentException("이미 파티에 가입되어 있습니다.");
+            throw new InvalidArgumentException(ErrorCode.PARTY_ALREADY_JOINED);
         }
 
         post.setCurrentCount(post.getCurrentCount() + 1);
@@ -209,7 +210,7 @@ public class PostService {
     public MyPostOneResponseDto selectParty(String loginId, Long postId) {
         // postId 검증
         Post posts = postRepository.findById(postId)
-                .orElseThrow(()->new IllegalArgumentException("게시글이 없습니다."));
+                .orElseThrow(()->new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
 
         // loginId 검증
         Member member = memberJpaRepository.findByLoginId(loginId)

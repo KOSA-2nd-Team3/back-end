@@ -27,7 +27,11 @@ public enum ErrorCode {
     EMAIL_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "A005", "이메일 인증이 필요합니다."),
 
     // Chat (4xxx)
-    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CR001", "해당 채팅룸을 찾을 수 없습니다.");
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CR001", "해당 채팅룸을 찾을 수 없습니다."),
+
+    // Post (5xxx)
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "포스트를 찾을 수 없습니다."),
+    PARTY_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "P002", "이미 파티에 가입되어 있습니다.");
 
     private final HttpStatus status;
     private final String code;

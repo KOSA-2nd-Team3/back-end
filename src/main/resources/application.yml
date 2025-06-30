@@ -130,3 +130,9 @@ p6spy:
     databaseDialectDateFormat: yyyy-MM-dd HH:mm:ss
     dateformat: yyyy-MM-dd HH:mm:ss
     excludecategories: info,debug,result,resultset
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
