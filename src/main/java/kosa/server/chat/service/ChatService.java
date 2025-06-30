@@ -303,7 +303,7 @@ public class ChatService {
         return partyMemberRepository.findByChatRoomId(roomId)
                 .stream()
                 .map(partyMember -> PartyMemberResponseDto.builder()
-                        .loginId(partyMember.getMember().getLoginId())
+                        .loginId(partyMember.getMember().getName())
                         .leaderYn(partyMember.getIsOwner())
                         .build())
                 .toList();
