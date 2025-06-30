@@ -8,7 +8,6 @@ import kosa.server.board.dto.response.PlatformPostNullResponseDto;
 import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
 import kosa.server.common.security.user.CustomUserPrincipal;
-import kosa.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -40,14 +39,16 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 내 페이지에서 내가 참여한 방 확인
+    // 내 페이지에서 내가 생성한 방 확인 (파티장)
     @GetMapping("/myPost")
     public ResponseEntity<Page<MyPostResponseDto>> myPost(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "createdAt") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection) {
-        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(principal.getName(), page, sortField, sortDirection);
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "active") String statusFilter) {
+        Page<MyPostResponseDto> myPostResponses = postService.readMyPost(
+                principal.getName(), page, sortField, sortDirection, statusFilter);
         return new ResponseEntity<>(myPostResponses, HttpStatus.OK);
     }
 
@@ -71,6 +72,7 @@ public class PostController {
         postService.prepareAndSendMail(postId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     // 파티원일때, 파티방 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> leaveMyPost(@PathVariable Long postId,
@@ -86,22 +88,24 @@ public class PostController {
         List<PlatformPostResponseDto> platformPostResponseDtos = postService.platformPostList(platformId);
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
     }
-  
-   @GetMapping("/platform/{platformId}/")
+
+    @GetMapping("/platform/{platformId}/")
     public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
         PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
         return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
     }
 
-    // 내가 partyMember로 참여한 모든 Post 조회
+    // 내가 partyMember로 참여한 모든 Post 조회 (파티원)
     @GetMapping("/myPost-join")
     public ResponseEntity<Page<MyPostResponseDto>> getMyPartyPosts(
             @AuthenticationPrincipal CustomUserPrincipal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "createdAt") String sortField,
-            @RequestParam(defaultValue = "desc") String sortDirection) {
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "active") String statusFilter) {
         String loginId = principal.getName();
-        Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(loginId, page, sortField, sortDirection);
+        Page<MyPostResponseDto> result = postService.findPostsByPartyMemberLoginId(
+                loginId, page, sortField, sortDirection, statusFilter);
         return ResponseEntity.ok(result);
     }
 
