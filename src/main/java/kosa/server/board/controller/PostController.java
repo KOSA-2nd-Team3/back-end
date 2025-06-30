@@ -72,9 +72,11 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
     // 파티원일때, 파티방 삭제
-    @PostMapping("/leaveMyPost")
-    public ResponseEntity<?> leaveMyPost(@RequestBody LeaveMyPostRequestDto request) {
-        postService.leaveMyPost(request.getPostId(), request.getLoginId());
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> leaveMyPost(@PathVariable Long postId,
+                                         @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        postService.leaveMyPost(postId, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
