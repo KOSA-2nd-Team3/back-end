@@ -66,19 +66,19 @@ public class ChatController {
     }
 
     // 채팅방 나가기
-    @DeleteMapping("/room/group/{roomId}/leave")
-    public ResponseEntity<?> leaveGroupChatRoom(@PathVariable Long roomId,
+    @DeleteMapping("/chat-room/{roomId}")
+    public ResponseEntity<?> deleteChatRoom(@PathVariable Long roomId,
                                                 @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-        log.info("/room/group/{roomId}/leave 요청");
-        chatService.leaveChatRoom(roomId, customUserPrincipal.getName());
+        log.info("/chat-room/{roomId} 요청");
+        chatService.deleteChatRoom(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }
 
     // 채팅방 나가기
-    @DeleteMapping("/")
-    public ResponseEntity<?> chatRoomMembers(@PathVariable Long roomId,
+    @DeleteMapping("/chat-room/{roomId}/leave")
+    public ResponseEntity<?> leaveChatRoom(@PathVariable Long roomId,
                                              @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-        log.info("/api/chat/member/list 요청");
+        log.info("/chat-room/{roomId}/leave 요청");
         chatService.leaveChatRoom(roomId, customUserPrincipal.getName());
         return ResponseEntity.ok().build();
     }

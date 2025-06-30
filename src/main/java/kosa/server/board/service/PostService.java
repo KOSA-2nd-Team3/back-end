@@ -97,8 +97,6 @@ public class PostService {
     public void leaveMyPost(Long postId, String loginId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("파티가 존재하지 않습니다."));
-//        Member member = memberJpaRepository.findByLoginId(loginId)
-//                .orElseThrow(()->new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Long memberId = post.getPartyMember().stream()
                 .map(PartyMember::getMember)

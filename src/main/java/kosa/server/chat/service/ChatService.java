@@ -229,7 +229,7 @@ public class ChatService {
         return dtos;
     }
 
-    public void leaveChatRoom(Long roomId, String loginId) {
+    public void deleteChatRoom(Long roomId, String loginId) {
         // 채팅방 조회
         ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
@@ -250,6 +250,24 @@ public class ChatService {
         if (chatParticipants.isEmpty()) {
             chatRoomJpaRepository.delete(chatRoom);
         }
+    }
+
+    public void leaveChatRoom(Long roomId, String loginId) {
+        // 채팅방 조회
+        ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException("room cannot be found"));
+
+        // 멤버 조회
+        Member member = memberJpaRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
+        if (chatRoom.getIsGroupChat().equals("N")) {
+            throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
+        }
+
+        ChatParticipant chatParticipant = chatParticipantJpaRepository.findByChatRoomAndMember(chatRoom, member)
+                .orElseThrow(() -> new EntityNotFoundException("참여자를 찾을 수 없습니다."));
+
+        chatParticipantJpaRepository.delete(chatParticipant);
     }
 
     public Long getOrCreatePrivateRoom(Long otherMemberId) {
