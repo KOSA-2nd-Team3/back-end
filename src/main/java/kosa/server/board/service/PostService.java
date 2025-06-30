@@ -50,7 +50,7 @@ public class PostService {
                 .member(findMember)
                 .current_count(request.getCurrentCount())
                 .partySize(request.getCapacity())
-                .durationMonth(createPlatform.getMonthUnit())
+                .durationMonth(request.getDurationMonth())
                 .isExpired("N")
                 .build();
 
