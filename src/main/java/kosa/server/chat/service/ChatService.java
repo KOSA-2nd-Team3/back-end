@@ -304,7 +304,7 @@ public class ChatService {
         return partyMemberRepository.findByChatRoomId(roomId)
                 .stream()
                 .map(partyMember -> PartyMemberResponseDto.builder()
-                        .loginId(partyMember.getMember().getName())
+                        .nickName(partyMember.getMember().getNickname())
                         .leaderYn(partyMember.getIsOwner())
                         .build())
                 .toList();

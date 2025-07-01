@@ -55,7 +55,7 @@ public class PlatformService {
 
         return findPostList.stream().map(post -> PlatformPostResponseDto.builder()
                 .postId(post.getId())
-                .leaderName(post.getMember().getName())
+                .nickName(post.getMember().getNickname())
                 .platformName(post.getPlatform().getName())
                 .platformPrice(post.getPlatform().getPrice().longValue())
                 .monthUnit(post.getPlatform().getMonthUnit())

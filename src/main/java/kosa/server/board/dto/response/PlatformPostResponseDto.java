@@ -13,8 +13,8 @@ public class PlatformPostResponseDto {
 
     @Schema(description = "게시글 ID", example = "1", required = true)
     private Long postId;
-    @Schema(description = "방장 이름", example = "홍길동", required = true)
-    private String leaderName;
+    @Schema(description = "방장 닉네임", example = "홍길동", required = true)
+    private String nickName;
     @Schema(description = "플랫폼 이름", example = "넷플릭스", required = true)
     private String platformName;
     @Schema(description = "플랫폼 가격", example = "12900", required = true)
