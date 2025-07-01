@@ -6,8 +6,6 @@ import jakarta.mail.MessagingException;
 import kosa.server.board.dto.request.*;
 import kosa.server.board.dto.response.MyPostOneResponseDto;
 import kosa.server.board.dto.response.MyPostResponseDto;
-import kosa.server.board.dto.response.PlatformPostNullResponseDto;
-import kosa.server.board.dto.response.PlatformPostResponseDto;
 import kosa.server.board.service.PostService;
 import kosa.server.common.security.user.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @Tag(name = "Post API")
 @RestController
@@ -90,21 +87,6 @@ public class PostController {
 
         postService.leaveMyPost(postId, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    // 플랫폼 별 파티 리스트 가져오기
-    @Operation(summary = "플랫폼별 파티 목록 조회", description = "특정 플랫폼의 모든 파티 리스트를 조회합니다.")
-    @GetMapping("/platform/{platformId}")
-    public ResponseEntity<List<PlatformPostResponseDto>> platformPostList(@PathVariable Long platformId) {
-        List<PlatformPostResponseDto> platformPostResponseDtos = postService.platformPostList(platformId);
-        return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
-    }
-
-    @Operation(summary = "플랫폼별 파티 통계 조회", description = "특정 플랫폼에 대해 빈 파티 정보를 조회합니다.")
-    @GetMapping("/platform/{platformId}/")
-    public ResponseEntity<PlatformPostNullResponseDto> platformPostNull(@PathVariable Long platformId) {
-        PlatformPostNullResponseDto platformPostNulls = postService.platformPostNull(platformId);
-        return new ResponseEntity<>(platformPostNulls, HttpStatus.OK);
     }
 
     // 내가 partyMember로 참여한 모든 Post 조회 (파티원)

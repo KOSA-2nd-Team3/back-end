@@ -194,19 +194,6 @@ public class PostService {
         });
     }
 
-    public Slice<PlatformPostResponseDto> findByPlatformName(String platformName) {
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        Slice<Post> postByPlatformName = postRepository.findPostByPlatformName(platformName, pageRequest);
-
-        return postByPlatformName.map(post -> PlatformPostResponseDto.builder()
-                .platformName(post.getPlatform().getName())
-                .partySize(post.getPartySize())
-                .currentCount(post.getCurrentCount())
-                .postId(post.getId())
-                .isExpired(post.getIsExpired())
-                .build());
-    }
-
     public MyPostOneResponseDto selectParty(String loginId, Long postId) {
         // postId 검증
         Post posts = postRepository.findById(postId)
@@ -252,33 +239,7 @@ public class PostService {
                 .build();
     }
 
-    public List<PlatformPostResponseDto> platformPostList(Long platformId) {
-        List<Post> findPostList = postRepository.findByPlatformId(platformId);
 
-        return findPostList.stream().map(post -> PlatformPostResponseDto.builder()
-                .postId(post.getId())
-                .leaderName(post.getMember().getName())
-                .platformName(post.getPlatform().getName())
-                .platformPrice(post.getPlatform().getPrice().longValue())
-                .monthUnit(post.getPlatform().getMonthUnit())
-                .currentCount(post.getCurrentCount())
-                .partySize(post.getPartySize())
-                .durationMonth(post.getDurationMonth())
-                .isExpired(post.getIsExpired())
-                .startDate(post.getStartDate())
-                .createdAt(post.getCreatedAt())
-                .build()).toList();
-    }
-
-    public PlatformPostNullResponseDto platformPostNull(Long platformId) {
-        Platform platform = platformRepository.findById(platformId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
-
-        return PlatformPostNullResponseDto.builder()
-                .platformName(platform.getName())
-                .platformPrice(platform.getPrice())
-                .build();
-    }
 
     // 파티원 조회 - 상태 필터 포함
     public Page<MyPostResponseDto> findPostsByPartyMemberLoginId(String loginId, int page, String sortField, String sortDirection, String statusFilter) {
