@@ -5,9 +5,7 @@ import kosa.server.common.code.ErrorCode;
 import kosa.server.common.dto.ErrorResponseDto;
 import kosa.server.member.exception.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -83,6 +81,18 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ex.getErrorCode();  // 예외에서 직접 errorCode 꺼내기
 
         log.warn("이메일 인증이 완료되지 않은 사용자 접근: {}", ex.getMessage());
+
+        ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
+        return new ResponseEntity<>(response, errorCode.getStatus());
+    }
+
+    @ExceptionHandler(DuplicateNicknameException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicateNicknameException(
+            DuplicateNicknameException ex, HttpServletRequest request
+    ) {
+        ErrorCode errorCode = ex.getErrorCode();
+
+        log.warn("[DuplicateNicknameException]: {} - Path: {}", ex.getMessage(), request.getRequestURI());
 
         ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
         return new ResponseEntity<>(response, errorCode.getStatus());

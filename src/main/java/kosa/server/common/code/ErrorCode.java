@@ -18,6 +18,7 @@ public enum ErrorCode {
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "M002", "이미 사용 중인 아이디입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "M003", "이미 사용 중인 이메일입니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "M004", "비밀번호가 일치하지 않습니다."),
+    DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "M005", "이미 사용 중인 닉네임입니다."),
 
     // Auth (3xxx)
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A001", "유효하지 않은 토큰입니다."),
