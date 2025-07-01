@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "Platform API")
 @Slf4j
 @RestController
-@RequestMapping("/api/list")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PlatformController {
 
@@ -26,7 +26,7 @@ public class PlatformController {
 
     // 메인 페이지
     @Operation(summary = "전체 플랫폼 조회", description = "메인 페이지에서 모든 플랫폼 목록을 조회합니다.")
-    @GetMapping("/main")
+    @GetMapping("/platforms/main")
     public ResponseEntity<List<PlatformCategoryDto>> getAllPlatforms() {
         List<PlatformCategoryDto> allPlatform = platformService.getAllPlatforms();
         return new ResponseEntity<>(allPlatform, HttpStatus.OK);
@@ -34,7 +34,7 @@ public class PlatformController {
 
     // 메인 페이지에서 카테고리 클릭
     @Operation(summary = "카테고리별 플랫폼 조회", description = "카테고리 클릭 시 해당 카테고리의 플랫폼 목록을 조회합니다.")
-    @GetMapping("/category/{category}")
+    @GetMapping("/platforms/category/{category}")
     public ResponseEntity<List<PlatformCategoryDto>> getPlatformsByCategory(@PathVariable("category") int category) {
         List<PlatformCategoryDto> categoryPlatform = platformService.getPlatformsByCategory(category);
         return new ResponseEntity<>(categoryPlatform, HttpStatus.OK);
@@ -42,7 +42,7 @@ public class PlatformController {
 
     // 플랫폼 별 파티 리스트 가져오기
     @Operation(summary = "플랫폼별 파티 목록 조회", description = "특정 플랫폼의 모든 파티 리스트를 조회합니다.")
-    @GetMapping("/platform/{platformId}")
+    @GetMapping("/platforms/{platformId}/post")
     public ResponseEntity<List<PlatformPostResponseDto>> platformPostList(@PathVariable Long platformId) {
         List<PlatformPostResponseDto> platformPostResponseDtos = platformService.platformPostList(platformId);
         return new ResponseEntity<>(platformPostResponseDtos, HttpStatus.OK);
