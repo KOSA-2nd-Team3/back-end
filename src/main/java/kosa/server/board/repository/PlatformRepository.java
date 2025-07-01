@@ -15,19 +15,6 @@ import java.util.Optional;
 @Repository
 public interface PlatformRepository extends JpaRepository<Platform, Long> {
 
-    @Query("SELECT p.name, COUNT(post), p.price, p.capacity " +
-            "FROM Platform p LEFT JOIN Post post ON p.id = post.platform.id " +
-            "GROUP BY p.id, p.name, p.price, p.capacity")
-    List<Object[]> countPostStatsByPlatform();
-
-    @Query("SELECT post.id, p.name, post.member.id, p.price, post.partySize, post.currentCount " +
-            "FROM Post post JOIN post.platform p "+
-            "WHERE p.name = :platformName")
-    List<Object[]> findPostStatsWithPlatform(@Param("platformName") String platformName);
-
-    Page<Post> findByCategory(int category, Pageable pageable);
-    Platform findByName(String name);
-
     List<Platform> findAllByOrderByCategoryAscNameAsc();
     List<Platform> findByCategoryOrderByNameAsc(int category);
 
