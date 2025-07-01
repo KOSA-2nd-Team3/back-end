@@ -3,16 +3,14 @@ package kosa.server.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kosa.server.common.security.user.CustomUserPrincipal;
+import kosa.server.member.dto.request.NicknameUpdateRequest;
 import kosa.server.member.dto.response.ProfileResponseDto;
 import kosa.server.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Member API")
 @Controller
@@ -30,11 +28,19 @@ public class MemberController {
         return ResponseEntity.ok(profileResponseDto);
     }
 
+    @Operation(summary = "닉네임 사용 가능 여부 체크", description = "바꾸고 싶은 닉네임을 사용할 수 있는지 확입합니다.")
+    @PostMapping("/nickname")
+    public ResponseEntity<Boolean> checkNickname(@RequestBody NicknameUpdateRequest request) {
+        boolean result = memberService.isNicknameAvailable(request.getNickname());
+        return ResponseEntity.ok(result);
+    }
+
     @Operation(summary = "닉네임 변경", description = "로그인된 사용자의 닉네임을 수정합니다.")
-    @PostMapping("/nickName")
-    public ResponseEntity<String> updateNickName(@AuthenticationPrincipal CustomUserPrincipal customUserDetails, @RequestBody String nickName) {
-        String loginId = customUserDetails.getUsername();
-        String updatedNickname = memberService.updateNickname(loginId, nickName);
+    @PutMapping("/nickname")
+    public ResponseEntity<String> updateNickName(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                 @RequestBody NicknameUpdateRequest request) {
+        String loginId = customUserPrincipal.getName();
+        String updatedNickname = memberService.updateNickname(loginId, request.getNickname());
         return ResponseEntity.ok(updatedNickname);
     }
 }
