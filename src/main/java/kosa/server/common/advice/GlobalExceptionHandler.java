@@ -88,4 +88,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, errorCode.getStatus());
     }
 
+    public ResponseEntity<ErrorResponseDto> handleInvalidArgument(
+            InvalidArgumentException ex, HttpServletRequest request) {
+
+        ErrorCode errorCode = ex.getErrorCode();
+
+        log.warn("[InvalidArgumentException]: {}", ex.getMessage(), ex);
+
+        ErrorResponseDto response = ErrorResponseDto.of(errorCode, request.getRequestURI());
+        return new ResponseEntity<>(response, errorCode.getStatus());
+    }
+
 }

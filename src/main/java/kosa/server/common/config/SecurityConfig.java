@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/post/**").permitAll()
                         .requestMatchers("/list/**").permitAll()
                         .requestMatchers("/*.png","/*.jpg" ).permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated());
         http
                 .sessionManagement((session) -> session

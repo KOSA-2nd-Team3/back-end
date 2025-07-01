@@ -16,6 +16,7 @@ import kosa.server.chat.repository.jpa.ChatRoomJpaRepository;
 import kosa.server.chat.repository.jpa.ReadStatusJpaRepository;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.member.entity.Member;
+import kosa.server.member.exception.InvalidArgumentException;
 import kosa.server.member.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -130,7 +131,7 @@ public class ChatService {
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (chatRoom.getIsGroupChat().equals("N")) {
-            throw new IllegalArgumentException("그룹 채팅이 아닙니다.");
+            throw new InvalidArgumentException(ErrorCode.NOT_A_GROUP_CHAT);
         }
 
         // 이미 참여자 인지 검증
@@ -168,7 +169,7 @@ public class ChatService {
         }
 
         if (!check) {
-            throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다.");
+            throw new InvalidArgumentException(ErrorCode.NOT_MEMBER_OF_CHAT_ROOM);
         }
 
         // 특정 room에 대한 message 조회
@@ -238,7 +239,7 @@ public class ChatService {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
         if (chatRoom.getIsGroupChat().equals("N")) {
-            throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
+            throw new InvalidArgumentException(ErrorCode.NOT_A_GROUP_CHAT);
         }
 
         ChatParticipant chatParticipant = chatParticipantJpaRepository.findByChatRoomAndMember(chatRoom, member)
@@ -261,7 +262,7 @@ public class ChatService {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("member cannot be found"));
         if (chatRoom.getIsGroupChat().equals("N")) {
-            throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
+            throw new InvalidArgumentException(ErrorCode.NOT_A_GROUP_CHAT);
         }
 
         ChatParticipant chatParticipant = chatParticipantJpaRepository.findByChatRoomAndMember(chatRoom, member)
