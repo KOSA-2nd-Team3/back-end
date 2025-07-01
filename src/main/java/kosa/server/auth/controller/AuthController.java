@@ -19,6 +19,7 @@ import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
 import kosa.server.member.exception.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 @Tag(name = "Auth API")
+@Slf4j
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @RestController
@@ -145,17 +148,22 @@ public class AuthController {
     @Operation(summary = "토큰 재발급", description = "리프레시 토큰을 통해 새로운 액세스 토큰을 발급받습니다.")
     @PostMapping("/token/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
+        log.info("/token reissue = {}", request.getRequestURI());
         // 쿠키에서 리프레시 토큰을 가져옴
         String refreshToken = cookieUtil.getCookie(request, "refreshToken")
                 .map(Cookie::getValue)
                 .orElseThrow(() -> new TokenNotFoundException(ErrorCode.TOKEN_NOT_FOUND));
 
         // 서비스를 호출하여 새로운 액세스 토큰을 발급
-        String newAccessToken = authService.reissue(refreshToken);
+        HashMap<String, String> tokenMap = authService.reissue(refreshToken);
 
         // 응답 헤더에 새로운 액세스 토큰을 추가
-        response.addHeader("Authorization", "Bearer " + newAccessToken);
+        response.addHeader("Authorization", "Bearer " + tokenMap.get("accessToken"));
+        // 쿠키에 새로운 리프레시 토큰 추가
+        cookieUtil.addCookie(response, "refreshToken", tokenMap.get("refreshToken"), 60 * 60 * 24 * 14);
 
         return ResponseEntity.ok("액세스 토큰이 성공적으로 재발급되었습니다.");
     }
+
+
 }
