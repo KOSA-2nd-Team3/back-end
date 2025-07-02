@@ -5,10 +5,11 @@ import kosa.server.board.dto.response.MyPostResponseDto;
 import kosa.server.board.dto.response.PartyMemberDto;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Post;
+import kosa.server.board.exception.PostNotFoundException;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.member.entity.Member;
-import kosa.server.member.exception.InvalidArgumentException;
+import kosa.server.common.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public class DashboardService {
     // 파티장 조회 - 상태 필터 포함
     public Page<MyPostResponseDto> readMyPost(String loginId, int page, String sortField, String sortDirection, String statusFilter) {
         Member member = memberJpaRepository.findByLoginId(loginId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(()->new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Sort sort = getSort(sortField, sortDirection);
         Pageable pageable = PageRequest.of(page, 9, sort);
@@ -68,11 +69,11 @@ public class DashboardService {
     public MyPostOneResponseDto selectParty(String loginId, Long postId) {
         // postId 검증
         Post posts = postRepository.findById(postId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(()->new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
 
         // loginId 검증
         Member member = memberJpaRepository.findByLoginId(loginId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(()->new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<PartyMemberDto> members = posts.getPartyMember()
                 .stream()
@@ -163,7 +164,7 @@ public class DashboardService {
     @Transactional
     public void startService(Long postId, int durationMonth) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
+                .orElseThrow(()->new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
 
         post.startService(durationMonth);
         postRepository.save(post);

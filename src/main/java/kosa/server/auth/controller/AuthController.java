@@ -17,7 +17,7 @@ import kosa.server.common.code.ErrorCode;
 import kosa.server.common.security.jwt.JwtProvider;
 import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
-import kosa.server.member.exception.TokenNotFoundException;
+import kosa.server.auth.exception.TokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

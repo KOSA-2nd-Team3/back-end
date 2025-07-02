@@ -7,15 +7,14 @@ import kosa.server.board.dto.response.*;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
+import kosa.server.board.exception.*;
 import kosa.server.board.repository.PartyMemberRepository;
 import kosa.server.board.repository.PlatformRepository;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.common.code.ErrorCode;
 import kosa.server.mail.service.MailService;
 import kosa.server.member.entity.Member;
-import kosa.server.member.exception.InvalidArgumentException;
-import kosa.server.member.exception.MemberNotFoundException;
-import kosa.server.member.exception.PartyFullException;
+import kosa.server.common.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class PostService {
     public Long create(PostCreateRequestDto request) {
         //dto를 post로 변환
         Platform createPlatform = platformRepository.findById(request.getPlatformId())
-                .orElseThrow(() -> new RuntimeException("플랫폼을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PlatformNotFoundException(ErrorCode.PLATFORM_NOT_FOUND));
 
         Member findMember = memberJpaRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(()-> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -73,9 +72,8 @@ public class PostService {
         //Post객체 수정
         //수정한 Post객체 DB에 저장
 
-        // todo 예외 만들기
         Post postToUpdate = postRepository.findById(request.getPostId())
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(()->new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
 
         PostUpdateRequestDto.PostUpdateRequestDtoBuilder editor = postToUpdate.toEditor();
         if (request.getHostPwd() != null) {
@@ -84,7 +82,7 @@ public class PostService {
         if (request.getHostId() != null) {
             editor.hostId(request.getHostId());
         }
-        // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 -1을 보내주기로
+        // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 0을 보내주기로
         if (request.getDurationMonth() != 0 && request.getDurationMonth() != postToUpdate.getDurationMonth()) {
             editor.durationMonth(request.getDurationMonth());
         }
@@ -94,7 +92,7 @@ public class PostService {
     // 파티 삭제, 나가기
     public void leaveMyPost(Long postId, String loginId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
 
         Long memberId = post.getPartyMember().stream()
                 .map(PartyMember::getMember)
@@ -124,11 +122,11 @@ public class PostService {
     // 파티 가입
     public void joinParty(String loginId, Long postId) {
         Member member = memberJpaRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
         // 비관적 락으로 Post 조회
         Post post = postRepository.findByIdWithLock(postId)
-                .orElseThrow(() -> new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
 
         // 파티 정원 체크
         if (post.getCurrentCount() >= post.getPartySize()) {
@@ -139,7 +137,7 @@ public class PostService {
         boolean alreadyJoined = post.getPartyMember().stream()
                 .anyMatch(pm -> pm.getMember().equals(member));
         if (alreadyJoined) {
-            throw new InvalidArgumentException(ErrorCode.PARTY_ALREADY_JOINED);
+            throw new AlreadyPartyJoinedException(ErrorCode.PARTY_ALREADY_JOINED);
         }
 
         PartyMember partyMember = PartyMember.builder()
@@ -155,6 +153,11 @@ public class PostService {
     // 동기 메서드: 데이터 준비
     public void prepareAndSendMail(Long postId) throws UnsupportedEncodingException, MessagingException {
         List<PartyMember> members = partyMemberRepository.findByPostId(postId);
+
+        if (members.isEmpty()) {
+            throw new PartyMemberNotFoundException(ErrorCode.PARTY_MEMBER_NOT_FOUND);
+        }
+
         List<MailTargetResponseDto> targets = members.stream()
                 .map(m -> new MailTargetResponseDto(
                         m.getMember().getEmail(),
@@ -167,7 +170,6 @@ public class PostService {
     }
 
     //만료 상태 업데이트
-    @Transactional
     public void updateExpiredPosts() {
         LocalDateTime today = LocalDateTime.now();
         List<Post> posts = postRepository.findAllByIsExpired("N");

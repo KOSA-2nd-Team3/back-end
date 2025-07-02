@@ -1,5 +1,7 @@
 package kosa.server.auth.oauth2.service;
 
+import kosa.server.auth.exception.RoleNotFoundException;
+import kosa.server.common.code.ErrorCode;
 import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.member.entity.Member;
 import kosa.server.member.entity.Role;
@@ -42,7 +44,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Optional<Member> optionalMember = memberJpaRepository.findByLoginId(customUserPrincipal.getName());
         if (optionalMember.isEmpty()) {
             Role role = roleJpaRepository.findByRoleName(RoleType.USER.getKey())
-                    .orElseThrow(() -> new RuntimeException("해당 권한 타입이 없습니다."));
+                    .orElseThrow(() -> new RoleNotFoundException(ErrorCode.ROLE_NOT_FOUND));
 
             Member member = Member.builder()
                     .loginId(customUserPrincipal.getName())
