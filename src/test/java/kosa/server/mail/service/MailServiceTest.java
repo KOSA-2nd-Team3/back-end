@@ -1,101 +1,128 @@
 package kosa.server.mail.service;
 
-import jakarta.mail.Address;
-import jakarta.mail.BodyPart;
-import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-import kosa.server.member.entity.Member;
-import org.junit.jupiter.api.*;
+import kosa.server.board.dto.response.MailTargetResponseDto;
+import kosa.server.board.repository.PartyMemberRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MailServiceTest {
 
     @Mock
+    private JavaMailSender notificationMailSender;
+
+    @Mock
+    private PartyMemberRepository partyMemberRepository;
+
+    @Mock
+    private SpringTemplateEngine templateEngine;
+
+    @Mock
+    private MimeMessage mimeMessage;
+
+    @InjectMocks
     private MailService mailService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // @Value로 주입되는 필드를 직접 설정
+        ReflectionTestUtils.setField(mailService, "fixedServiceSenderEmail", "test@example.com");
     }
 
     @Test
-    @DisplayName("메일을 보낼 수 있다.")
-    void sendMail() throws MessagingException, IOException {
+    @DisplayName("메일을 정상적으로 발송할 수 있다")
+    void sendMail_shouldSendEmailSuccessfully() throws MessagingException, UnsupportedEncodingException {
         // given
-        Member member1  = Member.builder()
-                .email("ghyunjin0913@naver.com")
-                .name("테스트유저1")
-                .build();
-        Member member2 = Member.builder()
-                .email("ghyunjin0913@gmail.com")
-                .name("테스트유저2")
-                .build();
-        List<Member> members = List.of(member1, member2);
+        MailTargetResponseDto target1 = new MailTargetResponseDto(
+                "user1@test.com",
+                "Netflix",
+                "http://localhost:3000/post/1",
+                4
+        );
 
-        String platform = "넷플릭스";
-        int partySize = 2;
-        Long fakePostId = 999L;
+        MailTargetResponseDto target2 = new MailTargetResponseDto(
+                "user2@test.com",
+                "Netflix",
+                "http://localhost:3000/post/1",
+                4
+        );
+
+        List<MailTargetResponseDto> targets = List.of(target1, target2);
+
+        // Mock 설정
+        when(notificationMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq("email-alert"), any(Context.class))).thenReturn("<html>Test HTML</html>");
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> mailService.sendMail(targets));
+
+        // verify
+        verify(notificationMailSender, times(2)).createMimeMessage(); // 2개의 메일이므로 2번 호출
+        verify(notificationMailSender, times(2)).send(mimeMessage);   // 2번 전송
+        verify(templateEngine, times(2)).process(eq("email-alert"), any(Context.class)); // 2번 템플릿 처리
+    }
+
+    @Test
+    @DisplayName("빈 리스트일 때는 메일을 발송하지 않는다")
+    void sendMail_shouldNotSendWhenListIsEmpty() throws MessagingException, UnsupportedEncodingException {
+        // given
+        List<MailTargetResponseDto> emptyTargets = List.of();
+
+        // when & then
+        assertThatNoException().isThrownBy(() -> mailService.sendMail(emptyTargets));
+
+        // verify
+        verify(notificationMailSender, never()).createMimeMessage();
+        verify(notificationMailSender, never()).send(any(MimeMessage.class));
+        verify(templateEngine, never()).process(anyString(), any(Context.class));
+    }
+
+    @Test
+    @DisplayName("템플릿 처리 시 올바른 변수가 전달된다")
+    void sendMail_shouldPassCorrectVariablesToTemplate() throws MessagingException, UnsupportedEncodingException {
+        // given
+        MailTargetResponseDto target = new MailTargetResponseDto(
+                "test@example.com",
+                "Disney+",
+                "http://localhost:3000/post/123",
+                3
+        );
+
+        List<MailTargetResponseDto> targets = List.of(target);
+
+        // Mock 설정
+        when(notificationMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq("email-alert"), any(Context.class))).thenReturn("<html>Test HTML</html>");
 
         // when
-        mailService.prepareAndSendMail(fakePostId);
+        mailService.sendMail(targets);
 
-        // then
-        verify(mailService, times(1)).prepareAndSendMail(fakePostId);
-
-        verifyNoMoreInteractions(mailService);
+        // then - ArgumentCaptor를 사용하여 Context 내용 검증
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        
+        verify(templateEngine).process(eq("email-alert"), contextCaptor.capture());
+        
+        Context capturedContext = contextCaptor.getValue();
+        assertThat(capturedContext.getVariable("ottName")).isEqualTo("Disney+");
+        assertThat(capturedContext.getVariable("postUrl")).isEqualTo("http://localhost:3000/post/123");
+        assertThat(capturedContext.getVariable("partySize")).isEqualTo(3);
     }
 }
-
-
-
-/*@SpringBootTest
-@ActiveProfiles("test")
-public class MailServiceTest {
-
-    @Autowired
-    private MailService mailService;
-
-    @Test
-    void setMail() throws InterruptedException, MessagingException, UnsupportedEncodingException {
-        // given
-        Member member = Member.builder()
-                .email("ghyunjin0913@naver.com")
-                .name("테스트유저")
-                .build();
-        List<Member> members = List.of(member);
-
-        // when
-        mailService.sendMail(members, "Netflix", 1, 999L);
-
-        // then
-        assertDoesNotThrow(() ->
-                mailService.sendMail(members, "Netflix", 4, 123L)
-        );
-    }
-}*/
-

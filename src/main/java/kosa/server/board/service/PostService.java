@@ -15,6 +15,7 @@ import kosa.server.mail.service.MailService;
 import kosa.server.member.entity.Member;
 import kosa.server.member.exception.InvalidArgumentException;
 import kosa.server.member.exception.MemberNotFoundException;
+import kosa.server.member.exception.PartyFullException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -124,20 +125,28 @@ public class PostService {
     public void joinParty(String loginId, Long postId) {
         Member member = memberJpaRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
-        Post post = postRepository.findById(postId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+        
+        // 비관적 락으로 Post 조회
+        Post post = postRepository.findByIdWithLock(postId)
+                .orElseThrow(() -> new InvalidArgumentException(ErrorCode.POST_NOT_FOUND));
+
+        // 파티 정원 체크
+        if (post.getCurrentCount() >= post.getPartySize()) {
+            throw new PartyFullException(ErrorCode.PARTY_FULL);
+        }
+
+        // 이미 가입했는지 체크
+        boolean alreadyJoined = post.getPartyMember().stream()
+                .anyMatch(pm -> pm.getMember().equals(member));
+        if (alreadyJoined) {
+            throw new InvalidArgumentException(ErrorCode.PARTY_ALREADY_JOINED);
+        }
 
         PartyMember partyMember = PartyMember.builder()
                 .post(post)
                 .member(member)
                 .isOwner("N")
                 .build();
-
-        boolean alreadyJoined = post.getPartyMember().stream()
-                .anyMatch(pm -> pm.getMember().equals(member));
-        if (alreadyJoined) {
-            throw new InvalidArgumentException(ErrorCode.PARTY_ALREADY_JOINED);
-        }
 
         post.setCurrentCount(post.getCurrentCount() + 1);
         partyMemberRepository.save(partyMember);
