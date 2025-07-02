@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   spring:
-    image: ysh66/ottmoa:latest   # ← 도커허브 계정/이미지명 실제 값으로!
+    image: hyunjin11/ottmoa:latest   # ← 도커허브 계정/이미지명 실제 값으로!
     container_name: spring-app
     restart: always
     ports:
