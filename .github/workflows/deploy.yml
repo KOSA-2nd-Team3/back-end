@@ -66,5 +66,5 @@ jobs:
             cat <<EOF > .env
             ${{ secrets.ENV_FILE }}
             EOF
-            docker-compose pull
-            docker-compose up -d
+            docker compose pull
+            docker compose up -d
