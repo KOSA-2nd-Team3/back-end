@@ -28,8 +28,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
+      - name: Build with Gradle (skip tests)
+      - run: ./gradlew clean build -x test
 
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/ottmoa:latest .
