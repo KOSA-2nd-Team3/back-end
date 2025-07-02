@@ -28,7 +28,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p FROM Post p " +
             "JOIN p.partyMember pm " +
             "JOIN pm.member m " +
-            "JOIN p.platform platform " +
+            "JOIN FETCH p.platform platform " +
             "WHERE m.loginId = :loginId " +
             "AND pm.isOwner = 'N' " +
             "AND p.isExpired = :isExpired",
