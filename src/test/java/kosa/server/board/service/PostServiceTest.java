@@ -9,7 +9,7 @@ import kosa.server.board.repository.PostRepository;
 import kosa.server.member.entity.Member;
 import kosa.server.member.entity.Role;
 import kosa.server.member.enums.RoleType;
-import kosa.server.member.exception.PartyFullException;
+import kosa.server.board.exception.PartyFullException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import kosa.server.member.repository.jpa.RoleJpaRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package kosa.server.member.exception;
+package kosa.server.common.exception;
 
 import kosa.server.common.code.ErrorCode;
 import lombok.Getter;

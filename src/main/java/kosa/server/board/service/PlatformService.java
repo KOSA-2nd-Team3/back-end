@@ -1,18 +1,23 @@
 package kosa.server.board.service;
 
-import kosa.server.board.dto.response.*;
+import kosa.server.board.dto.response.PlatformCategoryDto;
+import kosa.server.board.dto.response.PlatformPostNullResponseDto;
+import kosa.server.board.dto.response.PlatformPostResponseDto;
+import kosa.server.board.dto.response.PlatformResponseDto;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
+import kosa.server.board.exception.PlatformNotFoundException;
 import kosa.server.board.repository.PlatformRepository;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.common.code.ErrorCode;
-import kosa.server.member.exception.InvalidArgumentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class PlatformService {
@@ -23,6 +28,7 @@ public class PlatformService {
     // 전체 플랫폼
     public List<PlatformCategoryDto> getAllPlatforms() {
         List<Platform> platforms = platformRepository.findAllByOrderByCategoryAscNameAsc();
+
         return platforms.stream()
                 .map(platform -> PlatformCategoryDto.builder()
                         .platformId(platform.getId())
@@ -38,6 +44,7 @@ public class PlatformService {
     // 카테고리별 플랫폼
     public List<PlatformCategoryDto> getPlatformsByCategory(int category) {
         List<Platform> platforms = platformRepository.findByCategoryOrderByNameAsc(category);
+
         return platforms.stream()
                 .map(platform -> PlatformCategoryDto.builder()
                         .platformId(platform.getId())
@@ -51,9 +58,9 @@ public class PlatformService {
     }
 
     public List<PlatformPostResponseDto> platformPostList(Long platformId) {
-        List<Post> findPostList = postRepository.findByPlatformId(platformId);
+        List<Post> posts = postRepository.findByPlatformId(platformId);
 
-        return findPostList.stream().map(post -> PlatformPostResponseDto.builder()
+        return posts.stream().map(post -> PlatformPostResponseDto.builder()
                 .postId(post.getId())
                 .nickName(post.getMember().getNickname())
                 .platformName(post.getPlatform().getName())
@@ -70,7 +77,7 @@ public class PlatformService {
 
     public PlatformPostNullResponseDto platformPostNull(Long platformId) {
         Platform platform = platformRepository.findById(platformId)
-                .orElseThrow(()->new InvalidArgumentException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new PlatformNotFoundException(ErrorCode.PLATFORM_NOT_FOUND));
 
         return PlatformPostNullResponseDto.builder()
                 .platformName(platform.getName())
@@ -88,7 +95,7 @@ public class PlatformService {
 
     public PlatformResponseDto getPlatform(Long platformId) {
         Platform findPlatform = platformRepository.findById(platformId)
-                .orElseThrow(() -> new RuntimeException("Platform not found"));
+                .orElseThrow(() -> new PlatformNotFoundException(ErrorCode.PLATFORM_NOT_FOUND));
 
         return PlatformResponseDto.builder()
                 .platformId(findPlatform.getId())

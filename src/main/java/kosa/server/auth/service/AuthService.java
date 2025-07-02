@@ -5,7 +5,9 @@ import jakarta.mail.internet.MimeMessage;
 import kosa.server.auth.dto.JoinRequestDto;
 import kosa.server.auth.dto.LoginRequestDto;
 import kosa.server.auth.dto.UserInfoDto;
+import kosa.server.auth.exception.*;
 import kosa.server.common.code.ErrorCode;
+import kosa.server.common.exception.MemberNotFoundException;
 import kosa.server.common.security.jwt.JwtProvider;
 import kosa.server.member.entity.EmailVerificationToken;
 import kosa.server.member.entity.Member;
@@ -66,7 +68,7 @@ public class AuthService {
         }
         // 유저 타입 가져오기
         Role role = roleJpaRepository.findByRoleName(RoleType.USER.getKey())
-                .orElseThrow(() -> new RuntimeException("해당 권한 타입이 없습니다."));
+                .orElseThrow(() -> new RoleNotFoundException(ErrorCode.ROLE_NOT_FOUND));
 
         // 멤버 빌더 엔티티 생성(암호화 포함)
         Member newMember = Member.builder()
@@ -91,7 +93,6 @@ public class AuthService {
         log.info("회원가입 성공 ID : {}, loginId : {}, nickname : {}", newMember.getId(), newMember.getLoginId(), newMember.getNickname());
     }
 
-    // todo 예외처리
     public void sendVerificationEmail(String email) throws MessagingException {
         Member member = memberJpaRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));

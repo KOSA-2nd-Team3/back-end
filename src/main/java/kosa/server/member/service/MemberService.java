@@ -4,7 +4,7 @@ import kosa.server.common.code.ErrorCode;
 import kosa.server.member.dto.response.ProfileResponseDto;
 import kosa.server.member.entity.Member;
 import kosa.server.member.exception.DuplicateNicknameException;
-import kosa.server.member.exception.MemberNotFoundException;
+import kosa.server.common.exception.MemberNotFoundException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

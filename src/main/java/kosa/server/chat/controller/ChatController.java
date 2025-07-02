@@ -101,7 +101,6 @@ public class ChatController {
         return new ResponseEntity<>(partyMemberResponseDtos, HttpStatus.OK);
     }
 
-    //    /api/chat/room-by-post/{postId}
     @Operation(summary = "postId 기준 채팅방 ID 조회", description = "postId로 연결된 채팅방 ID를 조회합니다.")
     @GetMapping("/api/chat/room-by-post/{postId}")
     public ResponseEntity<?> chatRoomByPostId(@PathVariable Long postId,

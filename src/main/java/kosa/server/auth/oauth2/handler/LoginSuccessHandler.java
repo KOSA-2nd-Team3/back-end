@@ -3,6 +3,8 @@ package kosa.server.auth.oauth2.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kosa.server.common.code.ErrorCode;
+import kosa.server.common.exception.MemberNotFoundException;
 import kosa.server.common.security.jwt.JwtProvider;
 import kosa.server.common.security.user.CustomUserPrincipal;
 import kosa.server.common.util.CookieUtil;
@@ -37,7 +39,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         // 리프레시 토큰 DB에 저장 (일반 로그인과 동일)
         Member member = memberJpaRepository.findByLoginId(oAuth2User.getName())
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다.")); //todo 예외처리
+                .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         LocalDateTime refreshTokenExpireTime = LocalDateTime.now().plusSeconds(JwtProvider.REFRESH_TOKEN_EXPIRE_TIME / 1000);
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .member(member)
