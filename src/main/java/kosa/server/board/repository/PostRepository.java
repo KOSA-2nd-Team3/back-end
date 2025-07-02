@@ -17,7 +17,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 파티장 조회 - 상태 필터링 포함
     @Query(value = "SELECT p FROM Post p " +
             "JOIN FETCH p.platform platform " +
-            "JOIN FETCH p.chatRoom chatroom " +
             "WHERE p.member.id = :memberId " +
             "AND p.isExpired = :isExpired",
             countQuery = "SELECT COUNT(p) FROM Post p " +
