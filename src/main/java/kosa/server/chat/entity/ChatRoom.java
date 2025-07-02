@@ -21,7 +21,8 @@ public class ChatRoom extends BaseEntity {
 
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @Builder.Default
