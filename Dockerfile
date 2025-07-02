@@ -1,5 +1,5 @@
 # JDK 21 기반 경량 이미지 사용 (alpine: 가볍고 빠름)
-FROM openjdk:21-jdk-alpine
+FROM eclipse-temurin:21-jdk-jammy
 
 # (선택) 타임존 세팅 - Asia/Seoul로 맞추고 싶을 때
 ENV TZ=Asia/Seoul
