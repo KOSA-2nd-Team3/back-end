@@ -3,7 +3,6 @@ package kosa.server.mail.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import kosa.server.board.dto.response.MailTargetResponseDto;
-import kosa.server.board.repository.PartyMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -20,17 +20,16 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class MailServiceTest {
 
     @Mock
     private JavaMailSender notificationMailSender;
-
-    @Mock
-    private PartyMemberRepository partyMemberRepository;
 
     @Mock
     private SpringTemplateEngine templateEngine;

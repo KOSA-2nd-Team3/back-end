@@ -3,15 +3,13 @@ package kosa.server.board.service;
 import kosa.server.board.entity.PartyMember;
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
+import kosa.server.board.exception.PartyFullException;
 import kosa.server.board.repository.PartyMemberRepository;
-import kosa.server.board.repository.PlatformRepository;
 import kosa.server.board.repository.PostRepository;
 import kosa.server.member.entity.Member;
 import kosa.server.member.entity.Role;
 import kosa.server.member.enums.RoleType;
-import kosa.server.board.exception.PartyFullException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
-import kosa.server.member.repository.jpa.RoleJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -28,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class PostServiceTest {
 
     @Mock
@@ -37,14 +37,8 @@ class PostServiceTest {
     private MemberJpaRepository memberJpaRepository;
     
     @Mock
-    private PlatformRepository platformRepository;
-    
-    @Mock
     private PartyMemberRepository partyMemberRepository;
     
-    @Mock
-    private RoleJpaRepository roleJpaRepository;
-
     @InjectMocks
     private PostService postService;
 

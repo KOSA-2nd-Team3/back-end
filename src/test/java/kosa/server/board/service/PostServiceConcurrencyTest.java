@@ -2,22 +2,23 @@ package kosa.server.board.service;
 
 import kosa.server.board.entity.Platform;
 import kosa.server.board.entity.Post;
+import kosa.server.board.exception.PartyFullException;
 import kosa.server.board.repository.PartyMemberRepository;
 import kosa.server.board.repository.PlatformRepository;
 import kosa.server.board.repository.PostRepository;
+import kosa.server.chat.repository.jpa.ChatRoomJpaRepository;
 import kosa.server.member.entity.Member;
 import kosa.server.member.entity.Role;
 import kosa.server.member.enums.RoleType;
-import kosa.server.board.exception.PartyFullException;
 import kosa.server.member.repository.jpa.MemberJpaRepository;
 import kosa.server.member.repository.jpa.RoleJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
@@ -25,11 +26,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
 class PostServiceConcurrencyTest {
 
     @Autowired
@@ -53,33 +53,55 @@ class PostServiceConcurrencyTest {
     private Member testOwner;
     private Platform testPlatform;
     private Role userRole;
+    @Autowired
+    private ChatRoomJpaRepository chatRoomJpaRepository;
 
     @BeforeEach
     void setUp() {
-        // 실제 DB에 데이터 저장
-        userRole = Role.builder()
-                .roleName(RoleType.USER.getKey())
-                .build();
-        roleJpaRepository.save(userRole);
+        // Role이 이미 존재하는지 확인 후 없으면 생성
+        userRole = roleJpaRepository.findByRoleName(RoleType.USER.getKey())
+                .orElseGet(() -> {
+                    Role newRole = Role.builder()
+                            .roleName(RoleType.USER.getKey())
+                            .build();
+                    return roleJpaRepository.save(newRole);
+                });
 
-        testOwner = Member.builder()
-                .loginId("owner123")
-                .password("password")
-                .nickname("파티장")
-                .name("테스트유저")
-                .email("owner@test.com")
-                .role(userRole)
-                .enabled(true)
-                .build();
-        memberJpaRepository.save(testOwner);
+        // testOwner가 이미 존재하는지 확인 후 없으면 생성
+        testOwner = memberJpaRepository.findByLoginId("owner123")
+                .orElseGet(() -> {
+                    Member newOwner = Member.builder()
+                            .loginId("owner123")
+                            .password("password")
+                            .nickname("파티장")
+                            .name("테스트유저")
+                            .email("owner@test.com")
+                            .role(userRole)
+                            .enabled(true)
+                            .build();
+                    return memberJpaRepository.save(newOwner);
+                });
 
-        testPlatform = Platform.builder()
-                .name("Netflix")
-                .category(1)
-                .capacity(4)
-                .price(BigDecimal.valueOf(15000))
-                .build();
-        platformRepository.save(testPlatform);
+        // Platform이 이미 존재하는지 확인 (예: name 기준)
+        testPlatform = platformRepository.findByName("Netflix")
+                .orElseGet(() -> {
+                    Platform newPlatform = Platform.builder()
+                            .name("Netflix")
+                            .category(1)
+                            .capacity(4)
+                            .price(BigDecimal.valueOf(15000))
+                            .imageUrl("https://example.com/netflix.png")
+                            .build();
+                    return platformRepository.save(newPlatform);
+                });
+    }
+
+    @AfterEach
+    void cleanUpAfter() {
+        chatRoomJpaRepository.deleteAll();
+        partyMemberRepository.deleteAll();
+        postRepository.deleteAll();
+        memberJpaRepository.deleteAll();
     }
 
     @Test
