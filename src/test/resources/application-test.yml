@@ -6,31 +6,128 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    # 위는 H2 메모리 DB 기본값
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: id
+    password: pw
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   mail:
-    host: smtp.test.com
+    host: smtp.gmail.com
     port: 587
-    username: test@example.com
-    password: dummy-password
+    username: id  # 보내는 이메일
+    password: pw # 앱 비밀번호
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+          ssl:
+            enable: false
+    service:
+      sender:
+        host: smtp.gmail.com
+        port: 587
+        username: id
+        password: pw
+        ssl:
+          enable: false
+
+  # JPA & Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: none
     properties:
       hibernate:
-        format_sql: true
+        show_sql: true # 실행되는 SQL 쿼리를 로그로 보여줍니다.
+        format_sql: true # SQL 쿼리를 보기 좋게 정렬해줍니다.
+        default_batch_fetch_size: 100 # N+1 문제 해결을 위한 옵션
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  sql:
-    init:
-      mode: never
+  # JWT 시크릿 키 (기존 설정)
+  jwt:
+    secret: 'ylWNT6xLqUg/K2pcfxlwumvsJ4UWRmF3SVh/wufsS2E='
 
+  # OAuth2 Client
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: Google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+              - email
+          kakao:
+            client-name: Kakao
+            client-authentication-method: client_secret_post
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+              - profile_nickname
+          naver:
+            client-name: Naver
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
+            redirect-uri: ${NAVER_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            scope:
+              - email
+              - profile
+              - name
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
+
+# 로깅 레벨 설정
+logging:
+  level:
+    # 우리가 만든 애플리케이션 패키지의 로그 레벨을 DEBUG로 설정하여 더 자세한 로그를 봅니다.
+    kosa.server: DEBUG
+    # Hibernate가 실행하는 SQL을 DEBUG 레벨로 로깅합니다. (show_sql: true 와 유사)
+    org.hibernate.SQL: DEBUG
+    # SQL에 바인딩되는 파라미터 값을 TRACE 레벨로 로깅합니다. (매우 유용함)
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.messaging: DEBUG
+    org.springframework.web.socket: DEBUG
+    kosa.server.chat.config: DEBUG
+
+#p6spy
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+p6spy:
+  config:
+    logMessageFormat: com.p6spy.engine.spy.appender.MultiLineFormat
+    appender: com.p6spy.engine.spy.appender.Slf4JLogger
+    logLevel: info
+    databaseDialectDateFormat: yyyy-MM-dd HH:mm:ss
+    dateformat: yyyy-MM-dd HH:mm:ss
+    excludecategories: info,debug,result,resultset
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
