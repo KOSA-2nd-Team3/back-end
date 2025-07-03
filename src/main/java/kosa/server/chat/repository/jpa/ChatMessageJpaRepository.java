@@ -13,7 +13,7 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
     List<ChatMessage> findByChatRoomOrderByCreatedAtAsc(ChatRoom chatRoom);
 
     @Query("SELECT new kosa.server.chat.dto.ChatMessageResDto(" +
-            "m.chatRoom.id, m.content, mem.loginId, pm.isOwner, m.createdAt) " +
+            "m.chatRoom.id, m.content, mem.loginId, mem.nickname, pm.isOwner, m.createdAt) " +
             "FROM ChatMessage m " +
             "JOIN m.member mem " +
             "JOIN m.chatRoom cr " +
