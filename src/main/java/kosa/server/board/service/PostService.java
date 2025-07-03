@@ -68,9 +68,6 @@ public class PostService {
     }
 
     public void update(PostUpdateRequestDto request) {
-        //dto로부터 수정할 Post객체 가져오기
-        //Post객체 수정
-        //수정한 Post객체 DB에 저장
 
         Post postToUpdate = postRepository.findById(request.getPostId())
                 .orElseThrow(()->new PostNotFoundException(ErrorCode.POST_NOT_FOUND));
@@ -82,7 +79,6 @@ public class PostService {
         if (request.getHostId() != null) {
             editor.hostId(request.getHostId());
         }
-        // todo 프론트에서 인원수와 개월 수를 바꾸지 않는다면 0을 보내주기로
         if (request.getDurationMonth() != 0 && request.getDurationMonth() != postToUpdate.getDurationMonth()) {
             editor.durationMonth(request.getDurationMonth());
         }

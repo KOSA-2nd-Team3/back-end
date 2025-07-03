@@ -3,11 +3,15 @@ package kosa.server.board.scheduler;
 
 import kosa.server.board.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Configuration
+@EnableScheduling
 public class PostExpirationScheduler {
 
     private final PostService postService;
