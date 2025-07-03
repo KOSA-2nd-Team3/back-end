@@ -136,3 +136,6 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+custom:
+  site-host: ${SITE_HOST}
