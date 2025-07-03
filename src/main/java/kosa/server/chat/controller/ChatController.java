@@ -24,7 +24,7 @@ public class ChatController {
 
     // 그룹 채팅방 개설
     @Operation(summary = "그룹 채팅방 생성", description = "새로운 그룹 채팅방을 생성합니다.")
-    @PostMapping("/room/group/create")
+    @PostMapping("/api/room/group/create")
     public ResponseEntity<?> createGroupRoom(@RequestBody ChatRoomCreateDto chatRoomCreateDto,
                                              @AuthenticationPrincipal CustomUserPrincipal principal) {
         log.info("/room/group/create 요청");
@@ -45,7 +45,7 @@ public class ChatController {
 
     // 그룹채팅방 참여 API
     @Operation(summary = "그룹 채팅방 참여", description = "해당 postId의 그룹 채팅방에 참가합니다.")
-    @PostMapping("/room/group/{postId}/join")
+    @PostMapping("/api/room/group/{postId}/join")
     public ResponseEntity<?> joinGroupChatRoom(@PathVariable Long postId,
                                                @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/group/{roomId}/join 요청");
@@ -65,7 +65,7 @@ public class ChatController {
 
     // 채팅 메시지 읽음 처리
     @Operation(summary = "채팅 메시지 읽음 처리", description = "지정된 채팅방의 메시지를 읽음 처리합니다.")
-    @PostMapping("/room/{roomId}/read")
+    @PostMapping("/api/room/{roomId}/read")
     public ResponseEntity<?> messageRead(@PathVariable Long roomId,
                                          @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/room/{roomId}/read 요청");
@@ -75,7 +75,7 @@ public class ChatController {
 
     // 채팅방 나가기
     @Operation(summary = "채팅방 삭제", description = "채팅방을 삭제합니다.")
-    @DeleteMapping("/chat-room/{roomId}")
+    @DeleteMapping("/api/chat-room/{roomId}")
     public ResponseEntity<?> deleteChatRoom(@PathVariable Long roomId,
                                                 @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/chat-room/{roomId} 요청");
@@ -85,7 +85,7 @@ public class ChatController {
 
     // 채팅방 나가기
     @Operation(summary = "채팅방 나가기", description = "지정된 채팅방에서 나갑니다.")
-    @DeleteMapping("/chat-room/{roomId}/leave")
+    @DeleteMapping("/api/chat-room/{roomId}/leave")
     public ResponseEntity<?> leaveChatRoom(@PathVariable Long roomId,
                                              @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         log.info("/chat-room/{roomId}/leave 요청");
