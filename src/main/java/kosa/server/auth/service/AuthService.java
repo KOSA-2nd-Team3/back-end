@@ -21,6 +21,7 @@ import kosa.server.member.repository.jpa.RefreshTokenRepository;
 import kosa.server.member.repository.jpa.RoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +49,9 @@ public class AuthService {
     private final EmailVerificationTokenRepository tokenRepository;
     private final JwtProvider jwtProvider;
     private final SpringTemplateEngine templateEngine;
+
+    @Value("${custom.site-host}")
+    private String siteHost;
 
     public void joinMember(JoinRequestDto joinRequestDto) {
         // 비밀번호 확인 검증
@@ -110,7 +114,7 @@ public class AuthService {
         tokenRepository.save(verificationToken);
 
         // 이메일 전송
-        String verificationLink = "http://localhost:8080/api/auth/login/verify?token=" + token;
+        String verificationLink = "http://" + siteHost + "/api/auth/login/verify?token=" + token;
 
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);
