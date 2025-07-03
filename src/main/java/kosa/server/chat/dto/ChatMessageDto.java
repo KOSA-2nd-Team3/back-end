@@ -19,5 +19,7 @@ public class ChatMessageDto {
     private String message;
     @Schema(description = "보낸 사람의 로그인 ID", example = "user123", required = true)
     private String senderLoginId;
+    @Schema(description = "보낸 사람의 닉네임", example = "유저123", required = true)
+    private String senderNickName;
 
 }
