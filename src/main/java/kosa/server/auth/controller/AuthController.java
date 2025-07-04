@@ -106,9 +106,9 @@ public class AuthController {
 
         URI redirectUri;
         if (verified) {
-            redirectUri = URI.create("http://localhost:5173/?verified=true");
+            redirectUri = URI.create("http://54.180.25.56:80/?verified=true");
         } else {
-            redirectUri = URI.create("http://localhost:5173/verify-failed");
+            redirectUri = URI.create("http://54.180.25.56:80/verify-failed");
         }
 
         HttpHeaders headers = new HttpHeaders();
